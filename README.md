@@ -12,7 +12,7 @@ I use next folder tree for states configuration (you can see it in salt/master c
  - .git - nodes configuration
  - pillar/
  - top.sls
- - master/
+ - master/ - you can clone it as submodule into your configuration
    - .git - this repo with configs
    - # generic config folders
 
