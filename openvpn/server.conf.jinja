@@ -1,0 +1,43 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+port {{ pillar['openvpn']['port'] }}
+proto tcp
+dev tap
+
+ca {{ pillar['ssl']['ca_crt'] }}
+cert {{ pillar['ssl']['certs'] }}/openvpn.crt
+key {{ pillar['ssl']['keys'] }}/openvpn.key
+dh {{ pillar['ssl']['home'] }}/dh2048.pem
+
+client-config-dir {{ pillar['openvpn']['ccd'] }}
+
+server 10.10.0.0 255.255.255.0
+route 192.168.0.0 255.255.255.0
+
+tls-server
+tls-auth {{ pillar['ssl']['home'] }}/openvpn_ta.key 0
+tls-timeout 120
+auth MD5
+cipher BF-CBC
+
+client-to-client
+
+keepalive 10 120
+
+comp-lzo
+
+max-clients 10
+
+user nobody
+group nogroup
+
+persist-key
+persist-tun
+
+status openvpn-status.log
+log /var/log/openvpn.log
+verb 3
+mute 10

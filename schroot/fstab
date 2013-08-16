@@ -1,0 +1,11 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+/proc           /proc           none    rw,bind         0       0
+/sys            /sys            none    rw,bind         0       0
+/dev/pts        /dev/pts        none    rw,bind         0       0
+tmpfs           /dev/shm        tmpfs   defaults        0       0
+/srv            /srv            none    rw,bind         0       0

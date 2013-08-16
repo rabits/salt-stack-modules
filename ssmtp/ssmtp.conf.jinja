@@ -1,0 +1,13 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+root={{ pillar['mail']['admin'] }}
+mailhub={{ pillar['mail']['server'] }}:{{ pillar['mail']['port'] }}
+UseTLS=YES
+UseSTARTTLS=YES
+AuthMethod=LOGIN
+AuthUser={{ pillar['mail']['account'] }}
+AuthPass={{ pillar['mail']['password'] }}
+FromLineOverride=YES

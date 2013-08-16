@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?><!--
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+-->
+<!DOCTYPE pam_mount SYSTEM "pam_mount.conf.xml.dtd">
+<pam_mount>
+    <debug enable="0" />
+
+    <mntoptions allow="nosuid,nodev,loop,encryption,fsck,nonempty,allow_root" />
+    <mntoptions require="nosuid,nodev" />
+    <logout wait="0" hup="0" term="0" kill="0" />
+
+<!-- pam_mount parameters: Volume-related -->
+
+    <mkmountpoint enable="1" remove="true" />
+
+{% for user, mounts in pillar['crypt'][grains['nodename']].items() %}
+{%- for mountpoint, encrypteddisk in mounts.items() %}
+    <volume user="{{ user }}" fstype="auto" path="{{ encrypteddisk }}" mountpoint="{{ mountpoint }}" options="fsck,noatime" />
+{%- endfor %}
+{%- endfor %}
+
+</pam_mount>

@@ -1,0 +1,33 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+master: ss.{{ pillar['net']['main_domain'] }}
+master_port: 4506
+
+user: root
+
+cache_jobs: True
+
+acceptance_wait_time: 10
+
+loop_interval: 60
+
+failhard: False
+
+startup_states: 'highstate'
+
+renderer: yaml_jinja
+
+multiprocessing: True
+
+log_level: warning
+
+log_file: file:///dev/log
+log_level_logfile: info
+
+tcp_keepalive: True
+tcp_keepalive_idle: 300
+tcp_keepalive_cnt: -1
+tcp_keepalive_intvl: -1

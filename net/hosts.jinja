@@ -1,0 +1,12 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+127.0.0.1    localhost
+127.0.1.1    {{ grains['fqdn'] }}
+
+# VPN hosts:
+{% for host, args in pillar['net']['hosts'].items() %}{% if grains['id'] != host and not 'hidden' in args %}
+{{ args['ip'] }}    {{ host }}.host.{{ pillar['net']['main_domain'] }} {{ host }}{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
+{% endif %}{% endfor %}

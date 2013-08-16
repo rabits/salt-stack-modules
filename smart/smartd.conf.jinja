@@ -1,0 +1,8 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+{% for device in salt['additional.sd_list']() %}
+/dev/{{ device }} -n standby -H -l error -l selftest -f -s (S/../.././04|L/../../6/05) -m root -M daily
+{% endfor %}

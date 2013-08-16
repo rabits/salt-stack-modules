@@ -1,0 +1,39 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+server {
+    listen   80;
+    server_name stat.{{ pillar['net']['main_domain'] }};
+
+    allow 10.10.0.0/24;
+    deny all;
+
+    root {{ pillar['monitoring']['stat_dir'] }};
+    charset utf8;
+    limit_conn perip 20;
+    limit_conn perserver 150;
+
+    client_max_body_size 1m;
+    client_body_buffer_size 128k;
+
+    access_log /var/log/nginx/access.stat.{{ pillar['net']['main_domain'] }}.log;
+
+    location / {
+    }
+
+    location /rrd {
+        alias {{ pillar['monitoring']['rrd_dir'] }}/;
+        autoindex on;
+    }
+
+    # Cache control for static files
+    location ~* \.(jpg|jpeg|gif|png|css|js|ico|xml)$ {
+        gzip_static   on;
+        access_log    off;
+        log_not_found off;
+        expires       90d;
+    }
+}
+

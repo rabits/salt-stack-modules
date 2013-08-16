@@ -1,0 +1,6 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+ATTRS{manufacturer}=="Razer", ATTRS{product}=="Razer Hydra", MODE="0666"

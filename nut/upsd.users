@@ -1,0 +1,9 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+[upsmon]
+  pass = MonPasswD14129
+  allowfrom = localhost
+  upsmon master

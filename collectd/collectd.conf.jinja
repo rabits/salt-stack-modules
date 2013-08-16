@@ -1,0 +1,115 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+FQDNLookup true
+
+Interval 10
+Timeout 4
+
+LoadPlugin syslog
+<Plugin syslog>
+    LogLevel info
+</Plugin>
+
+LoadPlugin network
+<Plugin network>
+{%- if 'monitorserver' in pillar['net']['hosts'][grains['nodename']] %}
+    Listen "{{ pillar['net']['hosts'][grains['nodename']]['ip'] }}" "{{ pillar['monitoring']['port'] }}"
+{%- else %}
+    Server "{{ pillar['net']['main_domain'] }}" "{{ pillar['monitoring']['port'] }}"
+{%- endif %}
+</Plugin>
+
+{% if 'monitorserver' in pillar['net']['hosts'][grains['nodename']] %}
+LoadPlugin rrdtool
+<Plugin rrdtool>
+    DataDir "{{ pillar['monitoring']['rrd_dir'] }}"
+    CacheTimeout 1200
+    CacheFlush 1800
+    WritesPerSecond 40
+    RandomTimeout 300
+</Plugin>
+{%- endif %}
+
+LoadPlugin cpu
+LoadPlugin cpufreq
+LoadPlugin memory
+LoadPlugin vmem
+LoadPlugin load
+LoadPlugin conntrack
+LoadPlugin contextswitch
+LoadPlugin entropy
+LoadPlugin uptime
+LoadPlugin users
+
+LoadPlugin df
+<Plugin df>
+    FSType rootfs
+    FSType sysfs
+    FSType proc
+    FSType devtmpfs
+    FSType devpts
+    FSType tmpfs
+    FSType fusectl
+    FSType cgroup
+    IgnoreSelected true
+</Plugin>
+
+LoadPlugin disk
+#<Plugin disk>
+#    Disk "hda"
+#    Disk "/sda[23]/"
+#    IgnoreSelected false
+#</Plugin>
+
+LoadPlugin swap
+LoadPlugin processes
+LoadPlugin interface
+LoadPlugin irq
+
+LoadPlugin sensors
+#<Plugin sensors>
+#    SensorConfigFile "/etc/sensors3.conf"
+#</Plugin>
+
+LoadPlugin tail
+<Plugin "tail">
+  <File "/var/log/auth.log">
+    Instance "auth"
+    <Match>
+      Regex "sshd[^:]*: input_userauth_request: invalid user"
+      DSType "DeriveInc"
+      Type "derive"
+      Instance "sshd-invalid_user"
+    </Match>
+    <Match>
+      Regex "sshd[^:]*: Accepted password for"
+      DSType "DeriveInc"
+      Type "derive"
+      Instance "sshd-accepted_password"
+    </Match>
+    <Match>
+      Regex "sshd[^:]*: Accepted publickey for"
+      DSType "DeriveInc"
+      Type "derive"
+      Instance "sshd-accepted_publickey"
+    </Match>
+    <Match>
+      Regex "sshd[^:]*: Failed password for"
+      DSType "DeriveInc"
+      Type "derive"
+      Instance "sshd-failed_password"
+    </Match>
+  </File>
+</Plugin>
+
+LoadPlugin tcpconns
+<Plugin tcpconns>
+  LocalPort "80"
+  LocalPort "443"
+  LocalPort "{{ pillar['net']['ssh_port'] }}"
+</Plugin>
+
+Include "/etc/collectd/collectd.d/*.conf"

@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+        <title>Host statistics</title>
+
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <link rel="stylesheet" type="text/css" href="css/tabs-no-images.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquerytools.dateinput.skin1.css" />
+
+        <script type="text/javascript" src="js/dependencies.js"></script>
+        <script type="text/javascript" src="js/jarmon.js"></script>
+        <script type="text/javascript" src="js/jarmon_modules.js"></script>
+        <script type="text/javascript" src="js/jarmon_recipes.js"></script>
+    </head>
+
+    <body>
+        <div class="hostListControl">
+            <ul id="host_list"></ul>
+        </div>
+        <div class="chartRangeControl">
+            <form>
+                <div>
+                    <span class="timerange_control custom">
+                        <img src="icons/calendar.png" width="16" height="16" alt="calendar" class="from_custom"
+                             title="Click to choose a custom start date" />
+                        <input name="from_custom" type="text" readonly="readonly"
+                               title="Time range start" />
+                        <img src="icons/calendar.png" width="16" height="16" alt="calendar" class="to_custom"
+                             title="Click to choose a custom end date" />
+                        <input name="to_custom" type="text" readonly="readonly"
+                               title="Time range end" />
+                    </span>
+                    <span class="timerange_control standard">
+                        <select name="from_standard"
+                                title="Time range shortcuts - click to select an alternative time range" >
+                        </select>
+                    </span>
+                    <input name="from" type="hidden"  />
+                    <input name="to" type="hidden"  />
+                    <select name="tzoffset"
+                            title="Timezone offset - click to choose a custom timezone offset" ></select>
+                    <input name="action" value="Update" type="button"
+                           title="Graph update - click to update all graphs" />
+                </div>
+                <div class="range-preview"
+                     title="Time range preview - click and drag to select a custom timerange" ></div>
+            </form>
+        </div>
+        <div class="tabbed-chart-interface"></div>
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="title"></h2>
+            </div>
+            <div class="error"></div>
+            <div class="chart"></div>
+            <div class="graph-legend"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+#
+# The PAM configuration file for the sbuild `schroot' service
+#
+
+# ADDED TO PREVENT DOUBLE pam_mount
+auth    [success=1 default=ignore]  pam_unix.so nullok_secure
+auth    requisite           pam_deny.so
+auth    required            pam_permit.so
+auth    optional            pam_cap.so 
+#@include common-auth
+@include common-account
+session [default=1]         pam_permit.so
+session requisite           pam_deny.so
+session required            pam_permit.so
+session optional            pam_umask.so
+session required    pam_unix.so 
+session optional            pam_xdg_support.so 
+session optional            pam_ck_connector.so nox11
+#@include common-session

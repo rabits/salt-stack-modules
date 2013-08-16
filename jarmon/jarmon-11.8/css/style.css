@@ -1,0 +1,131 @@
+body {
+    font-family: sans;
+    width: 960px;
+    margin: 20px auto 10px auto;
+}
+
+form div {
+    text-align: center;
+}
+
+h2 {
+    font-size: 14px;
+}
+
+p, li, dt, dd, td, th, div {
+    font-size: 12px;
+}
+
+.loading .title {
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    background-image: url(/icons/loading.gif);
+}
+
+.range-preview {
+    height:50px;
+    margin: 0 auto 10px auto;
+    position: relative;
+}
+
+.chart {
+    height:200px;
+    width: 850px;
+    margin: 0 auto 0 auto;
+    clear: both;
+}
+
+.tickLabel {
+    width:50px;
+    overflow:hidden;
+}
+
+.graph-legend {
+    width: 790px;
+    padding: 5px 0 5px 0;
+    margin: 10px auto 0 auto;
+    background-color: #f7f7f7;
+    position: relative;
+    left: 25px;
+}
+
+.graph-legend .legendItem {
+    float: left;
+    cursor: pointer;
+    margin-right: 20px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.graph-legend .disabled {
+    text-decoration: line-through;
+}
+
+.graph-legend .legendColorBox {
+    float: left;
+    margin-right: 5px;
+}
+
+input[type=checkbox] {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+input[type=text] {
+    padding: 3px;
+    border: 1px solid #EEE;
+}
+
+.notice {
+    border: 1px solid Green;
+    background: #FFDDFF;
+    margin-bottom: 20px;
+    padding: 5px;
+}
+
+#calroot {
+    z-index: 2;
+}
+
+.chart-header {
+    width: 790px;
+    padding: 5px 0 5px 0;
+    margin: 20px auto 0 auto;
+    position: relative;
+    left: 25px;
+}
+
+.chart-header:AFTER {
+    content: ''
+}
+
+.chart-container h2{
+    float: left;
+    margin: 0;
+}
+
+.chart-container .chart-controls{
+    float: right;
+    margin: 0;
+}
+
+.tab-controls {
+    width: 790px;
+    padding: 5px 0 5px 0;
+    margin: 20px auto 0 auto;
+    text-align: right;
+    position: relative;
+    left: 25px;
+}
+
+#host_list {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    border: 1px solid #EEE;
+}
+
+#host_list li {
+    padding-right: 20px;
+}

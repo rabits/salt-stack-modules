@@ -1,0 +1,52 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+interface: 0.0.0.0
+publish_port: 4505
+ret_port: 4506
+
+user: salt-stack
+max_open_files: 100000
+worker_threads: 4
+
+verify_env: True
+keep_jobs: 24
+
+timeout: 5
+loop_interval: 60
+
+job_cache: True
+minion_data_cache: True
+
+open_mode: False
+auto_accept: False
+
+client_acl:
+  www-data:
+    - test.ping
+
+state_top: top.sls
+renderer: yaml_jinja
+state_verbose: False
+state_output: mixed
+
+file_roots:
+  base:
+    - /srv/salt/
+  master:
+    - /srv/salt/master
+    - /srv/ssl
+
+file_ignore_regex:
+  - '/\.git($|/)'
+
+pillar_roots:
+  base:
+    - /srv/salt/pillar
+
+log_level: warning
+
+log_file: file:///dev/log
+log_level_logfile: info

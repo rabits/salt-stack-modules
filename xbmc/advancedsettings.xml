@@ -1,0 +1,3 @@
+<advancedsettings> 
+  <cputempcommand>sensors|sed -ne "s/CPUTIN: \+[-+]\([0-9]\+\).*/\1 C/p"</cputempcommand> 
+</advancedsettings>

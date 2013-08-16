@@ -1,0 +1,7 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+ATTRS{idVendor}=="127f", ATTRS{idProduct}=="e007", MODE="0666"
+ATTRS{idVendor}=="127f", ATTRS{idProduct}=="e008", MODE="0666"

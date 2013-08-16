@@ -1,0 +1,7 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+start_smartd=yes
+smartd_opts="--interval=1800"

@@ -1,0 +1,107 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+[ca]
+default_ca = CA_DEFAULT
+
+[CA_DEFAULT]
+dir       = {{ pillar['ssl']['ca'] }}/db
+database  = $dir/index.txt
+serial    = $dir/serial
+RANDFILE  = $dir/.rand
+
+certs         = {{ pillar['ssl']['certs'] }}
+new_certs_dir = {{ pillar['ssl']['newcerts'] }}
+crl_dir       = {{ pillar['ssl']['crls'] }}
+crl           = {{ pillar['ssl']['crl'] }}
+
+certificate = {{ pillar['ssl']['ca_crt'] }}
+private_key = {{ pillar['ssl']['ca_key'] }}
+
+x509_extensions = usr_cert
+
+default_days     = 3650
+default_crl_days = 7
+default_md       = md5
+
+policy = policy_match
+
+[ policy_match ]
+countryName            = optional
+stateOrProvinceName    = optional
+organizationName       = optional
+organizationalUnitName = optional
+commonName             = supplied
+emailAddress           = optional
+
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+attributes         = req_attributes
+x509_extensions    = v3_ca
+string_mask        = utf8only
+
+[ req_distinguished_name ]
+countryName         = Country Name (2 letter code)
+countryName_default = NA
+countryName_min     = 2
+countryName_max     = 2
+
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = NA
+
+localityName         = Locality Name (eg, city)
+localityName_default = NA
+
+0.organizationName         = Organization Name (eg, company)
+0.organizationName_default = NA
+
+organizationalUnitName         = Organizational Unit Name (eg, section)
+organizationalUnitName_default = NA
+
+commonName     = Common Name (e.g. server FQDN or YOUR name)
+commonName_max = 64
+
+emailAddress         = Email Address
+emailAddress_default = NA
+emailAddress_max     = 40
+
+[ req_attributes ]
+challengePassword     = A challenge password
+challengePassword_min = 4
+challengePassword_max = 20
+unstructuredName      = An optional company name
+
+[ usr_cert ]
+# These extensions are added when 'ca' signs a request.
+basicConstraints       = CA:FALSE
+nsCertType             = client, email, objsign
+nsComment              = "OpenSSL Generated Certificate"
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer:always
+extendedKeyUsage       = clientAuth
+keyUsage               = digitalSignature
+
+[ server ]
+# Make a cert with nsCertType set to "server"
+basicConstraints       = CA:FALSE
+nsCertType             = server
+nsComment              = "OpenSSL Generated Server Certificate"
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer:always
+extendedKeyUsage       = serverAuth
+keyUsage               = digitalSignature, keyEncipherment
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints       = CA:FALSE
+keyUsage               = nonRepudiation, digitalSignature, keyEncipherment
+
+[ v3_ca ]
+# Extensions for a typical CA
+basicConstraints       = CA:true
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+nsCertType             = sslCA, emailCA

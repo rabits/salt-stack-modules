@@ -1,0 +1,151 @@
+#!/bin/sh
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+#
+# Rabits 2012
+#
+# Backup control script for cryptsetup, lvm and rsync
+#
+# Usage:
+#  # rbackup.sh [daily|weekly|umount]
+#  - By default script do backup (if now is friday - do weekly backup)
+#  - If provided 'daily' or 'weekly' - it only mounts this partitions (do not forget to umount it)
+#  - If provided 'umount' - script only umount & detach backup partitions
+#
+# Root Crontab:
+# # Backup
+# 0 22 * * * /usr/local/bin/backup.sh 2>&1 | /usr/bin/logger -t BACKUP
+#
+
+BACKUP_FOLDERS='{% for folder in pillar['backup'][grains['nodename']]['folders'] %} {{ folder }}{% endfor %}'
+
+BACKUP_CRYPT={{ pillar['backup'][grains['nodename']]['disk'] }}
+BACKUP_CRYPT_KEY={{ pillar['backup'][grains['nodename']]['keyfile'] }}
+BACKUP_LVM_VG=backup
+BACKUP_LVM_DAILY=daily
+BACKUP_LVM_WEEKLY=weekly
+BACKUP_LOCKFILE=/run/lock/backup.lock
+BACKUP_LOCK_TIME=$((24*3600))
+
+BACKUP_DAILY="/dev/${BACKUP_LVM_VG}/${BACKUP_LVM_DAILY}"
+BACKUP_WEEKLY="/dev/${BACKUP_LVM_VG}/${BACKUP_LVM_WEEKLY}"
+
+# Script...
+
+if [ `id -u` -ne 0 ]
+then
+    echo "This script must be run by root ($(id -u))" 1>&2
+    exit 1
+fi
+
+lock()
+{
+    if [ -f "${BACKUP_LOCKFILE}" ] && [ $(( $(stat "${BACKUP_LOCKFILE}" -c "%Y") + ${BACKUP_LOCK_TIME})) -gt $(date "+%s") ]; then
+        notify "Lockfile is present. Skip backup running"
+        exit 0
+    fi
+    touch "${BACKUP_LOCKFILE}"
+    notify "Backup process is locked for ~$((${BACKUP_LOCK_TIME}/3600))h" "message"
+}
+
+unlock()
+{
+    notify "Backup process unlocked" "message"
+    rm -f "${BACKUP_LOCKFILE}"
+}
+
+detachBackup()
+{
+    /bin/umount ${backup_dir} 1>/dev/null 2>&1
+    /sbin/vgchange -a n "${BACKUP_LVM_VG}" 1>/dev/null 2>&1 && /sbin/cryptsetup luksClose "${BACKUP_LVM_VG}_crypt" 1>/dev/null 2>&1
+    unlock
+}
+
+notify()
+{
+    if [ "${2}" = "error" ]; then
+        level="critical"
+    elif [ "${2}" = "message" ]; then
+        level="low"
+    else
+        level="normal"
+    fi
+    title=`date "+%Y/%m/%dT%H:%M:%S"`" ${backup_type} Backup ${2}"
+
+    echo "BACKUP: "${title}"\t: "$1
+    /usr/bin/notify-send -i backup -u ${level} "${title}" "$1"
+
+    if [ "${2}" = "error" ]; then
+        detachBackup
+        exit 1
+    fi
+}
+
+backup_dir=/mnt/backup_dir
+
+if [ $(date +%u) -eq 5 -a "x${1}" != "xdaily" \
+     -o "x${1}" = "xweekly" -a "x${1}" != "xdaily" ]; then
+    backup_disk=${BACKUP_WEEKLY}
+    backup_type="Weekly"
+else
+    backup_disk=${BACKUP_DAILY}
+    backup_type="Daily"
+fi
+
+notify "Script started"
+
+if [ "x${1}" = "xunlock" ]; then
+    # We need only unlock
+    unlock
+    exit 0
+fi
+
+lock
+
+if [ "x${1}" = "xlock" ]; then
+    # We need only lock
+    exit 0
+fi
+
+# Check basic dirs
+[ ! -d ${backup_dir} ] && /bin/mkdir ${backup_dir}
+for folder in ${BACKUP_FOLDERS}; do
+    [ -d "${folder}" ] || notify "Can't find backup forder ${folder}" "error"
+done
+
+# Detach old backup dirs
+detachBackup
+
+if [ "x${1}" = "xumount" ]; then
+    # We need only detach
+    unlock
+    notify "Disk & folder ${backup_disk} successfully detached" "message"
+    exit 0
+fi
+
+# Preparing disk to backup
+[ -b ${BACKUP_CRYPT} ] || notify "Can't find crypt disk ${BACKUP_CRYPT}" "error"
+[ -f ${BACKUP_CRYPT_KEY} ] || notify "Can't find crypt keyfile ${BACKUP_CRYPT_KEY}" "error"
+/bin/chown root:root "${BACKUP_CRYPT_KEY}"
+/bin/chmod 0600 "${BACKUP_CRYPT_KEY}"
+
+# Decrypting disk & enabling VG
+/sbin/cryptsetup --key-file="${BACKUP_CRYPT_KEY}" luksOpen "${BACKUP_CRYPT}" "${BACKUP_LVM_VG}_crypt" 1>/dev/null 2>&1 && /sbin/vgchange -a y "${BACKUP_LVM_VG}" 1>/dev/null 2>&1
+
+[ ! -L ${backup_disk} ] && notify "Can't find backup disk to sync files: ${backup_disk}" "error"
+
+if [ "x${1}" = "x" ]; then
+    # Do backup...
+    notify "Started backup: ${BACKUP_FOLDERS} to ${backup_disk}"
+    OUT=$(/bin/mount "${backup_disk}" "${backup_dir}" && /usr/bin/rsync -a --delete ${BACKUP_FOLDERS} "${backup_dir}" 2>&1 ; /bin/umount "${backup_dir}")
+
+    detachBackup
+
+    echo "BACKUP: ${OUT}"
+    notify "Backup completed" "message"
+else
+    /bin/mount "${backup_disk}" "${backup_dir}"
+    notify "Mounted into ${backup_dir}, do not forget to detach it by exec '${0} umount'" "message"
+fi

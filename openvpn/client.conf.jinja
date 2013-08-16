@@ -1,0 +1,31 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+client
+proto tcp
+dev tap
+
+remote {{ pillar['openvpn']['host'] }}
+port {{ pillar['openvpn']['port'] }}
+
+ca {{ pillar['ssl']['ca_crt'] }}
+cert {{ pillar['ssl']['certs'] }}/{{ grains['nodename'] }}.crt
+key {{ pillar['ssl']['keys'] }}/{{ grains['nodename'] }}.key
+
+tls-client
+tls-auth {{ pillar['ssl']['home'] }}/openvpn_ta.key 1
+auth MD5
+cipher BF-CBC
+
+ns-cert-type server
+comp-lzo
+
+persist-key
+persist-tun
+
+status openvpn-status.log
+log /var/log/openvpn.log
+verb 3
+mute 10
