@@ -3,5 +3,8 @@
 # This file is under CM control - all manual changes will be removed
 #
 
+# AFPD Dongle
 ATTRS{idVendor}=="127f", ATTRS{idProduct}=="e007", MODE="0666"
 ATTRS{idVendor}=="127f", ATTRS{idProduct}=="e008", MODE="0666"
+# ACE RC Generic Dongle
+ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="70bd", MODE="0666"
