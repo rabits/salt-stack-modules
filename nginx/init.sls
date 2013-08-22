@@ -36,5 +36,5 @@ nginx-full:
 nginx:
   service.running:
     - reload: True
-    - require:
+    - watch:
       - pkg: nginx-full

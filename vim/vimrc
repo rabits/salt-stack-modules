@@ -1,0 +1,182 @@
+"
+" WARNING:
+" This file is under CM control - all manual changes will be removed
+"
+
+" set charset translation encoding
+set encoding=utf-8
+" set terminal encoding
+set termencoding=utf-8
+" set save encoding
+set fileencoding=utf-8
+" List of good encodings
+set fileencodings=utf8,cp1251,cp866,koi8r,ucs-2le,ascii
+
+"-------------------------
+" Basic settings
+"-------------------------
+
+syntax on
+
+set number
+set nocompatible
+set ruler
+set showcmd
+set nofoldenable
+
+set autoindent
+set smartindent
+set expandtab
+
+set listchars+=precedes:<,extends:>
+
+set backupdir=/tmp
+set directory=/tmp
+
+set scrolljump=7
+set scrolloff=7
+set sidescroll=5
+
+set termencoding=utf-8
+
+set hidden
+set ch=1
+set mousehide
+set backspace=indent,eol,start
+set statusline=%<%f%h%m%r\ %b\ %{&encoding}\ 0x\ \ %l,%c%V\ %P 
+set laststatus=2
+
+set fo+=cr
+
+set sessionoptions=curdir,buffers,tabpages
+
+"------------------------------------------
+
+highlight Comment ctermfg=darkgreen
+set background=dark
+colorscheme elflord
+
+"------------------------------------------
+
+set ignorecase
+set hlsearch
+set incsearch
+
+"------------------------------------------
+
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+
+set smarttab
+set smartcase
+set nowrap
+set sidescrolloff=5
+set guifont=terminus
+
+"------------------------------------------
+
+" CTRL-F for omni completion
+imap <C-F> <C-X><C-O>
+imap {<CR> {<CR>}<Esc>O<Space><Space><Space><Space>
+
+" Control+Space auto-add
+imap <C-Space> <C-N>
+
+nmap <Home> ^
+imap <Home> <Esc>I
+
+" Line Numeration
+imap <F1> <Esc>:set<Space>nu!<CR>a
+nmap <F1> :set<Space>nu!<CR>
+
+" Search highlight
+imap <S-F1> <Esc>:set<Space>hls!<CR>a
+nmap <S-F1> :set<Space>hls!<CR>
+
+" Auto-wrap
+imap <F2> <Esc>:set<Space>wrap!<CR>a
+nmap <F2> :set<Space>wrap!<CR>
+
+" Close buffer
+imap <C-F4> <Esc>:bd<CR>a
+nmap <C-F4> :bd<CR>
+
+" F5 - previous buffer
+map <F5> :bp<cr>
+vmap <F5> <esc>:bp<cr>i
+imap <F5> <esc>:bp<cr>i
+
+" F6 - next buffer
+map <F6> :bn<cr>
+vmap <F6> <esc>:bn<cr>i
+imap <F6> <esc>:bn<cr>i
+
+" < & > - indent block
+vmap < <gv
+vmap > >gv
+
+" --------------------------------
+
+set wildmenu
+set wcm=<Tab>
+menu Encoding.koi8-r  :e ++enc=koi8-r<CR>
+menu Encoding.cp1251  :e ++enc=cp1251<CR>
+menu Encoding.cp866   :e ++enc=cp866<CR>
+menu Encoding.ucs-2le :e ++enc=ucs-2le<CR>
+menu Encoding.utf-8   :e ++enc=utf-8<CR>
+map <F12> :emenu Encoding.<Tab>
+
+"-------------------------------------------------------------------------------
+
+set showmatch
+set history=500
+filetype plugin on
+filetype indent on
+set undolevels=500
+set ttyfast
+
+filetype plugin on
+au BufRead,BufNewFile *.phps set filetype=php
+au BufRead,BufNewFile *.thtml set filetype=php
+
+let g:SessionMgr_AutoManage = 0
+let g:SessionMgr_DefaultName = "mysession"
+
+let g:Tlist_Show_One_File = 1
+
+set completeopt-=preview
+set completeopt+=longest
+set mps-=[:]
+
+"-------------------------------------------------------------------------------
+
+" highlight SpellErrors ctermfg=red cterm=underline term=reverse
+let spell_executable = "aspell"
+let spell_language_list = "ru,en"
+let spell_auto_type = "txt,mail,text,none"
+let spell_guess_language_ft = "txt,mail,text"
+nmap \sr :SpellSetLanguage ru<CR>
+nmap \se :SpellSetLanguage en<CR>
+
+if version >= 700
+setlocal spell spelllang=
+setlocal nospell
+function ChangeSpellLang()
+	if &spelllang =~ "en_us"
+		setlocal spell spelllang=ru
+		echo "spelllang: ru"
+	elseif &spelllang =~ "ru"
+		setlocal spell spelllang=
+		setlocal nospell
+		echo "spelllang: off"
+	else
+		setlocal spell spelllang=en_us
+		echo "spelllang: en"
+	endif
+endfunc
+
+" map spell on/off for English/Russian
+map <F11> <Esc>:call ChangeSpellLang()<CR>
+endif
+
