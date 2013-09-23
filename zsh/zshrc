@@ -204,18 +204,18 @@ function extract () {
   do
     if [[ -f "$FILE" ]]; then
         case "$FILE" in
-            *.tbz2 | *.tar.bz2) tar -xvjf  "$FILE"     ;;
-            *.txz | *.tar.xz)   tar -xvJf  "$FILE"     ;;
-            *.tgz | *.tar.gz)   tar -xvzf  "$FILE"     ;;
-            *.tar | *.cbt)      tar -xvf   "$FILE"     ;;
-            *.zip | *.cbz)      unzip      "$FILE"     ;;
-            *.rar | *.cbr)      unrar x    "$FILE"     ;;
-            *.arj)              unarj x    "$FILE"     ;;
-            *.ace)              unace x    "$FILE"     ;;
-            *.bz2)              bunzip2    "$FILE"     ;;
-            *.xz)               unxz       "$FILE"     ;;
-            *.gz)               gunzip     "$FILE"     ;;
-            *.7z)               7z x       "$FILE"     ;;
+            *.tbz2 | *.tar.bz2) tar -xvjf  "$FILE" ;;
+            *.txz | *.tar.xz)   tar -xvJf  "$FILE" ;;
+            *.tgz | *.tar.gz)   tar -xvzf  "$FILE" ;;
+            *.tar | *.cbt)      tar -xvf   "$FILE" ;;
+            *.zip | *.cbz)      unzip      "$FILE" ;;
+            *.rar | *.cbr)      unrar x    "$FILE" ;;
+            *.arj)              unarj x    "$FILE" ;;
+            *.ace)              unace x    "$FILE" ;;
+            *.bz2)              bunzip2    "$FILE" ;;
+            *.xz)               unxz       "$FILE" ;;
+            *.gz)               gunzip     "$FILE" ;;
+            *.7z)               7zr x      "$FILE" ;;
             *.Z)                uncompress "$FILE"     ;;
             *.gpg)       gpg2 -d "$FILE" | tar -xvzf - ;;
             *) echo 'Error: failed to extract "'$FILE'"' ;;

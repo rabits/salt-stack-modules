@@ -21,6 +21,7 @@ debootstrap --variant=buildd --arch=amd64 raring /srv/schroot/raring64 'http://a
     - unless: test -d /srv/schroot/raring64
     - require:
       - pkg: schroot-pkgs
+      - file: /srv/schroot
 
 /etc/schroot/chroot.d/raring64.conf:
   file.managed:

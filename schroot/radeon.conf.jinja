@@ -1,0 +1,13 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+[radeon]
+description=Ubuntu Raring 13.04 Radeon
+directory=/srv/schroot/radeon
+root-users={% for user in pillar['users'] %}{% if 'admin' in pillar['users'][user] and pillar['users'][user]['admin'] == True %}{{ user }},{% endif %}{% endfor %}
+type=directory
+users={{ pillar['users']|join(',') }}
+profile=desktop
+
