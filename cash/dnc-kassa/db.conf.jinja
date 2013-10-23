@@ -1,0 +1,6 @@
+[DB] {{ dbname }}
+[USER] {{ salt['pillar.get']('cash:user', 'kassir') }}
+[PASS] {{ salt['pillar.get']('cash:password', '') }}
+[HOST] {{ salt['pillar.get']('cash:host', '') }}
+[PORT] {{ salt['pillar.get']('cash:port', '') }}
+[LOG] /tmp/dnc_{{ dbname }}.log

@@ -1,0 +1,19 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "Stream server starting"
+author      "Rabit <home@rabits.org>"
+
+start on net-device-up
+stop on runlevel [!2345]
+
+kill signal INT
+
+respawn
+
+setuid rstream
+setgid rstream
+
+exec /usr/local/bin/rstream.py -v "{{ pillar['rstream']['streams'][stream]['url'] }}"{% for var, val in pillar['rstream']['streams'][stream].items() %}{% if var in ['user', 'password', 'output-dir', 'file-name', 'duration-limit', 'reset-url', 'log-file'] %} --{{ var }} '{{ val }}'{% endif %}{% endfor %}

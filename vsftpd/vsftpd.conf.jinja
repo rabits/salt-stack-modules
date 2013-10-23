@@ -1,0 +1,26 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+listen=YES
+listen_ipv6=NO
+
+anonymous_enable={% if anon %}YES{% else %}NO{% endif %}
+local_enable={% if users %}YES{% else %}NO{% endif %}
+
+write_enable={% if write %}YES{% else %}NO{% endif %}
+anon_umask=000
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_root=/srv/ftp
+
+use_localtime=YES
+
+xferlog_enable=YES
+
+dirmessage_enable=YES
+ftpd_banner=FTP server
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
