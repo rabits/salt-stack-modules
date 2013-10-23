@@ -3,15 +3,15 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-data_directory = '/var/lib/postgresql/9.1/main'
-hba_file = '/etc/postgresql/9.1/main/pg_hba.conf'
-ident_file = '/etc/postgresql/9.1/main/pg_ident.conf'
+data_directory = '/var/lib/postgresql/{{ version }}/main'
+hba_file = '/etc/postgresql/{{ version }}/main/pg_hba.conf'
+ident_file = '/etc/postgresql/{{ version }}/main/pg_ident.conf'
 
-external_pid_file = '/var/run/postgresql/9.1-main.pid'
+external_pid_file = '/var/run/postgresql/{{ version }}-main.pid'
 
 # --- CONNECTIONS AND AUTHENTICATION
 
-listen_addresses = 'localhost'
+listen_addresses = '{{ listen }}'
 port = 5432
 max_connections = 100
 unix_socket_directory = '/var/run/postgresql'

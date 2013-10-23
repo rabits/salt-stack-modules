@@ -1,0 +1,3 @@
+[submodule "rstream/src"]
+	path = rstream/src
+	url = https://github.com/rabits/rstream.git

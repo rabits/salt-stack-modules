@@ -13,7 +13,7 @@ include:
 
 schroot-radeon-debootstrap:
   cmd.run:
-    - name: debootstrap --variant=minbase --arch=amd64 --include=xserver-xorg,libfontconfig1,libqtcore4,libxcursor1,libxfixes3,libxxf86vm1,xinit,libc6-i386,dkms,lib32gcc1,linux-headers,python,curl,x2x raring /srv/schroot/radeon 'http://archive.ubuntu.com/ubuntu/'
+    - name: debootstrap --variant=minbase --arch=amd64 --include=xserver-xorg,libfontconfig1,libqtcore4,libxcursor1,libxfixes3,libxxf86vm1,xinit,libc6-i386,dkms,lib32gcc1,linux-headers-generic,python,curl,linux-sound-base,alsa-utils,software-properties-common raring /srv/schroot/radeon 'http://archive.ubuntu.com/ubuntu/'
     - unless: test -d /srv/schroot/radeon
     - require:
       - pkg: schroot-pkgs
@@ -30,20 +30,11 @@ schroot-radeon-debootstrap:
     - require:
       - pkg: schroot-pkgs
 
-/srv/schroot/radeon/root/fglrx.deb:
-  file.managed:
-    - source: salt://fglrx/fglrx_12.104-0ubuntu1_amd64.deb
-    - user: root
-    - group: root
-    - mode: 644
-    - require:
-      - cmd: schroot-radeon-debootstrap
-
 schroot-radeon-install-fglrx:
   cmd.wait:
-    - name: mount --bind /dev /srv/schroot/radeon/dev && chroot /srv/schroot/radeon dpkg -i /root/fglrx.deb ; umount /srv/schroot/radeon/dev
+    - name: mount --bind /dev /srv/schroot/radeon/dev && chroot /srv/schroot/radeon sh -cx 'dpkg --add-architecture i386 ; echo "deb http://archive.ubuntu.com/ubuntu raring main restricted universe multiverse" > /etc/apt/sources.list ; add-apt-repository -y ppa:xorg-edgers/ppa ; apt-get update ; apt-get install -y --no-install-recommends fglrx-13 x2x' ; umount /srv/schroot/radeon/dev
     - watch:
-      - file: /srv/schroot/radeon/root/fglrx.deb
+      - cmd: schroot-radeon-debootstrap
 
 /srv/schroot/radeon/etc/X11/xorg.conf:
   file.managed:
@@ -63,3 +54,11 @@ schroot-radeon-install-fglrx:
     - require:
       - cmd: schroot-radeon-debootstrap
 
+/srv/schroot/radeon/etc/asound.conf:
+  file.managed:
+    - source: salt://schroot/radeon.asound.conf
+    - user: root
+    - group: root
+    - mode: 644
+    - require:
+      - cmd: schroot-radeon-debootstrap

@@ -2,7 +2,9 @@
 # PostgreSQL relation database
 #
 
-{% set version="9.1" %}
+{% set version = salt['pillar.get']('postgresql:'+grains['id']+':version', '9.1') %}
+{% set listen = salt['pillar.get']('postgresql:'+grains['id']+':listen', 'localhost') %}
+{% set access = salt['pillar.get']('postgresql:'+grains['id']+':access', '127.0.0.1/32') %}
 
 postgresql:
   pkg:
@@ -17,7 +19,11 @@ postgresql:
 
 /etc/postgresql/{{ version }}/main/postgresql.conf:
   file.managed:
-    - source: salt://postgresql/postgresql.conf
+    - source: salt://postgresql/postgresql.conf.jinja
+    - template: jinja
+    - context:
+      version: {{ version }}
+      listen: {{ listen }}
     - user: root
     - group: postgres
     - mode: 640
@@ -28,7 +34,10 @@ postgresql:
 
 /etc/postgresql/{{ version }}/main/pg_hba.conf:
   file.managed:
-    - source: salt://postgresql/pg_hba.conf
+    - source: salt://postgresql/pg_hba.conf.jinja
+    - template: jinja
+    - context:
+      access: {{ access }}
     - user: root
     - group: postgres
     - mode: 640

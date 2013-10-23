@@ -4,10 +4,9 @@
 #
 
 [radeon]
-description=Ubuntu Raring 13.04 Radeon
+description=Ubuntu Raring 13.04 radeon
 directory=/srv/schroot/radeon
 root-users={% for user in pillar['users'] %}{% if 'admin' in pillar['users'][user] and pillar['users'][user]['admin'] == True %}{{ user }},{% endif %}{% endfor %}
 type=directory
 users={{ pillar['users']|join(',') }}
 profile=desktop
-
