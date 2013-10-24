@@ -45,6 +45,7 @@ ftp:
     - opts:
       - defaults
       - bind
-    - watch_in:
+    - remount: False
+    - require_in:
       - service: vsftpd
 {% endfor %}

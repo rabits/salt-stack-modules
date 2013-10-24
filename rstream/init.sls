@@ -1,10 +1,10 @@
 #
-# rStream video server
+# rStream Video Digital Recorder
 #
 
 rstream:
   pkg.installed:
-    pkgs:
+    - pkgs:
       - python-gi
       - gir1.2-gstreamer-1.0
       - gstreamer1.0-libav
@@ -23,7 +23,7 @@ rstream:
   group:
     - present
   user.present:
-    - gid: {{ salt['file.group_to_gid']('rstream') }}
+    - gid_from_name: True
     - require:
       - group: rstream
 
@@ -32,7 +32,6 @@ rstream:
     - user: root
     - group: root
     - mode: 755
-    - clean: True
 
 /srv/streams/archive:
   file.directory:
@@ -40,6 +39,7 @@ rstream:
     - group: rstream
     - mode: 755
     - require:
+      - user: rstream
       - file: /srv/streams
 
 /srv/streams/archive/log:
@@ -48,27 +48,32 @@ rstream:
     - group: rstream
     - mode: 755
     - require:
+      - user: rstream
       - file: /srv/streams/archive
 
-{% for stream, data in pillar['rstream']['streams'].items() %}
+{% for stream, data in salt['pillar.get']('rstream:streams', {}).items() %}
 /srv/streams/{{ data['name'] }}.strm:
   file.managed:
     - user: root
     - group: root
     - mode: 644
-    - replace: False
     - contents: {{ data['url'] }}
+    - require:
+      - file: /srv/streams
 
 {% if data['save'] %}
 /etc/init/rstream-{{ stream }}.conf:
   file.managed:
     - source: salt://rstream/upstart.conf.jinja
     - template: jinja
-    - context:
-      stream: {{ stream }}
     - user: root
     - group: root
     - mode: 644
+    - context:
+      stream: {{ stream }}
+    - require:
+      - file: rstream
+      - file: /srv/streams/archive
 
 rstream-{{ stream }}:
   service.running:
