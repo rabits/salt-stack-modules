@@ -9,7 +9,7 @@ kassir:
   group:
     - present
   user.present:
-    - gid: {{ salt['file.group_to_gid']('kassir') }}
+    - gid_from_name: True
     - groups:
       - dnc
       - dialout

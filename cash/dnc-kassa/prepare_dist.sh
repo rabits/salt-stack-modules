@@ -1,16 +1,21 @@
 #!/bin/sh
 # DNC DIST prepare script
 # How to use:
-# 1. Create dist directory
+# 1. Create dnc directory
 #  $ mkdir -p dnc
 # 2. Unpack installer 1.2.5 into "dnc" dir
 # 3. Unpack with replace updater 1.2.8 into "dnc" dir
 # 4. Run prepare_dist.sh in current directory
 
-PREFIX="dist"
+PREFIX="$(dirname "$0")/dist"
 INST_DIR="$(dirname "$0")/dnc"
 
 echo "Preparing of ${PREFIX} started..."
+if [ ! -d "${INST_DIR}" ]
+then
+    echo "Couldn't find ${INST_DIR} directory" >&2
+    exit 1
+fi
 mkdir -p "${PREFIX}"
 if [ $? -ne 0 ]
 then
@@ -31,7 +36,7 @@ mkdir -p "${PREFIX}/usr/share/dnc"
 cp -vr "${INST_DIR}/movie" "${PREFIX}/usr/share/dnc/"
 cp -vr "${INST_DIR}/Example_print_document" "${PREFIX}/usr/share/dnc/print_doc"
 
-for arch in x86 x86_64
+for arch in i686 x86_64
 do
     case "${arch}" in
         x86_64)
