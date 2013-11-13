@@ -3,8 +3,7 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-LoadPlugin nginx
-<Plugin nginx>
-    URL "http://localhost/status?auto"
-    User "www-user"
+LoadPlugin exec
+<Plugin exec>
+    Exec "collectd" "/usr/local/sbin/radeon_info.sh"
 </Plugin>

@@ -55,3 +55,12 @@ def sd_list():
     import os
     return [name for name in os.listdir('/sys/block') if name.startswith('sd') ]
 
+def substring_search(what, where):
+    '''
+    Return True if substring is placed in array of gpus
+
+    CLI Example::
+
+        salt '*' additional.substring_search 'Radeon' [{'model':'asd Radeon asdds'}]
+    '''
+    return any(what in s['model'] for s in where)

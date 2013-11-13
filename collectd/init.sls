@@ -2,29 +2,27 @@
 # Collectd monitor client
 #
 
-{% if salt['additional.state_in'](['nginx']) %}
 include:
+  - sensors
+{% if salt['additional.state_in'](['nginx']) %}
   - collectd.nginx
 {% endif %}
 {% if salt['additional.state_in'](['openvpn.server']) %}
-include:
   - collectd.openvpn
 {% endif %}
 {% if salt['additional.state_in'](['nut']) %}
-include:
   - collectd.nut
 {% endif %}
 {% if salt['additional.state_in'](['libvirt']) %}
-include:
   - collectd.libvirt
 {% endif %}
 {% if salt['additional.state_in'](['postgresql']) %}
-include:
   - collectd.postgresql
 {% endif %}
+{% if salt['additional.substring_search']('Radeon', grains['gpus']) %}
+  - collectd.radeon
+{% endif %}
 
-include:
-  - sensors
 
 collectd5-repo:
   pkgrepo.managed:
@@ -63,3 +61,8 @@ collectd:
       - pkg: collectd-core
       - pkg: libsensors4
 
+collectd:
+  user.present:
+    - gid: {{ salt['file.group_to_gid']('nogroup') }}
+    - shell: /bin/false
+    - createhome: False

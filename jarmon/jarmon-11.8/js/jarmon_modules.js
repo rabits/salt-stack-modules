@@ -251,3 +251,28 @@ jarmon_modules['nginx'] = {
     ],
     options: jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS)
 }
+
+jarmon_modules['video_load'] = {
+    type: 'Video',
+    data: [
+        ['gauge-load', 0, 'Load', '%'],
+    ],
+    options: jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS)
+}
+
+jarmon_modules['video_freq'] = {
+    type: 'Video',
+    data: [
+        ['gauge-cpu', 0, 'CPU Freq', 'Hz'],
+        ['gauge-mem', 0, 'MEM Freq', 'Hz'],
+    ],
+    options: jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS)
+}
+
+jarmon_modules['video_temp'] = {
+    type: 'Video',
+    data: [
+        ['temperature', 0, 'Temp', 'C'],
+    ],
+    options: jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS)
+}
