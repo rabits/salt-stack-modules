@@ -33,9 +33,9 @@ PermitEmptyPasswords no
 
 ChallengeResponseAuthentication no
 
-PasswordAuthentication {{ 'no' if 'remote' in grains['roles'] else 'yes' }}
+PasswordAuthentication {{ 'no' if 'remote' in salt['grains.get']('roles', {}) else 'yes' }}
 
-X11Forwarding {{ 'yes' if 'desktop' in grains['roles'] else 'no' }}
+X11Forwarding {{ 'yes' if 'desktop' in salt['grains.get']('roles', {}) else 'no' }}
 X11DisplayOffset 10
 PrintMotd no
 PrintLastLog yes
@@ -43,6 +43,10 @@ TCPKeepAlive yes
 
 AcceptEnv LANG LC_*
 
-Subsystem sftp /usr/lib/openssh/sftp-server
-
 UsePAM yes
+
+Subsystem sftp internal-sftp
+
+Match Group sftpusers
+    ChrootDirectory /srv/sftp/%u
+    ForceCommand internal-sftp

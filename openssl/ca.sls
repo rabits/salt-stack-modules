@@ -45,7 +45,7 @@ include:
   file.managed:
     - user: root
     - group: root
-    - mode: 640
+    - mode: 644
     - require:
       - file: {{ pillar['ssl']['ca'] }}/db
 
@@ -53,7 +53,7 @@ include:
   file.managed:
     - user: root
     - group: root
-    - mode: 640
+    - mode: 644
     - replace: False
     - contents: '01'
     - require:

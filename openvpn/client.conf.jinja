@@ -4,8 +4,8 @@
 #
 
 client
-proto tcp
-dev tap
+proto udp
+dev tun
 
 remote {{ pillar['openvpn']['host'] }}
 port {{ pillar['openvpn']['port'] }}

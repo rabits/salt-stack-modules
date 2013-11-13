@@ -8,7 +8,9 @@ ssh:
   service.running:
     - require:
       - pkg: ssh
-      - file: /etc/ssh/sshd_config
+
+sshfs:
+  pkg.installed
 
 /etc/ssh/sshd_config:
   file.managed:
@@ -20,3 +22,42 @@ ssh:
     - makedirs: True
     - require:
       - pkg: ssh
+    - watch_in:
+      - service: ssh
+
+sftpusers:
+  group.present
+
+sftp:
+  group:
+    - present
+  user.present:
+    - gid_from_name: True
+    - groups:
+      - sftpusers
+    - require:
+      - group: sftp
+      - group: sftpusers
+
+/srv/sftp:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: 755
+    - makedirs: True
+    - require:
+      - pkg: ssh
+
+/srv/sftp/sftp:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: 755
+
+/home/sftp:
+  file.directory:
+    - user: sftp
+    - group: sftp
+    - mode: 750
+    - require:
+      - user: sftp

@@ -4,8 +4,8 @@
 #
 
 port {{ pillar['openvpn']['port'] }}
-proto tcp
-dev tap
+proto udp
+dev tun
 
 ca {{ pillar['ssl']['ca_crt'] }}
 cert {{ pillar['ssl']['certs'] }}/openvpn.crt

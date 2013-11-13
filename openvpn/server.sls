@@ -66,5 +66,5 @@ openssl req -config {{ pillar['ssl']['ca_config'] }} -extensions server -new -ne
     - user: root
     - group: root
     - mode: 644
-    - contents: ifconfig-push {{ args['ip'] }} 255.255.255.0
+    - contents: ifconfig-push {{ args['ip'] }} 10.10.0.1
 {% endif %}{% endfor %}

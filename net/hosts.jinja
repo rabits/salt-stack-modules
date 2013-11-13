@@ -8,5 +8,5 @@
 
 # VPN hosts:
 {% for host, args in pillar['net']['hosts'].items() %}{% if grains['id'] != host and not 'hidden' in args %}
-{{ args['ip'] }}    {{ host }}.host.{{ pillar['net']['main_domain'] }} {{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
+{{ args['ip'] }}    {{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
 {% endif %}{% endfor %}

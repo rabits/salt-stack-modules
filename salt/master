@@ -30,7 +30,7 @@ client_acl:
 state_top: top.sls
 renderer: yaml_jinja
 state_verbose: False
-state_output: mixed
+state_output: changes
 
 file_roots:
   base:

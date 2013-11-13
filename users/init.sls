@@ -7,7 +7,7 @@
   group:
     - present
   user.present:
-    - gid: {{ salt['file.group_to_gid'](user) }}
+    - gid_from_name: True
 {% if 'fullname' in args %}
     - fullname: {{ args['fullname'] }}
 {% endif %}
