@@ -19,7 +19,7 @@ xbmc:
   group:
     - present
   user.present:
-    - gid: {{ salt['file.group_to_gid']('xbmc') }}
+    - gid_from_name: True
     - groups:
       - video
       - audio
@@ -127,26 +127,26 @@ xinit:
   file.directory:
     - user: root
     - group: xbmc
-    - mode: 775
+    - mode: 777
     - makedirs: True
 
 /srv/media/video/serials:
   file.directory:
     - user: root
     - group: xbmc
-    - mode: 775
+    - mode: 777
     - makedirs: True
 
 /srv/media/video/clips:
   file.directory:
     - user: root
     - group: xbmc
-    - mode: 775
+    - mode: 777
     - makedirs: True
 
 /srv/media/music:
   file.directory:
     - user: root
     - group: xbmc
-    - mode: 775
+    - mode: 777
     - makedirs: True

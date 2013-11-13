@@ -2,6 +2,8 @@
 # rTorrent downloader
 #
 
+{% set xbmc_present = salt['additional.state_in'](['xbmc']) %}
+
 rtorrent:
   pkg:
     - installed
@@ -11,7 +13,11 @@ rtorrent:
   group:
     - present
   user.present:
-    - gid: {{ salt['file.group_to_gid']('rtorrent') }}
+    - gid_from_name: True
+    {%- if xbmc_present %}
+    - groups:
+      - xbmc
+    {%- endif %}
     - require:
       - group: rtorrent
       - pkg: rtorrent
@@ -21,7 +27,7 @@ rtorrent:
     - watch:
       - pkg: rtorrent
 
-/srv/torrent/process:
+/srv/torrent/incomplete:
   file.directory:
     - user: rtorrent
     - group: rtorrent
@@ -39,6 +45,15 @@ rtorrent:
     - require:
       - user: rtorrent
 
+/srv/torrent/completed:
+  file.directory:
+    - user: rtorrent
+    - group: rtorrent
+    - mode: 755
+    - makedirs: True
+    - require:
+      - user: rtorrent
+
 /srv/torrent/watch:
   file.directory:
     - user: rtorrent
@@ -47,6 +62,21 @@ rtorrent:
     - makedirs: True
     - require:
       - user: rtorrent
+
+{% if xbmc_present %}
+{% for name in ['music', 'movies', 'serials', 'clips'] %}
+/srv/torrent/watch/{{ name }}:
+  file.directory:
+    - user: rtorrent
+    - group: rtorrent
+    - mode: 775
+    - makedirs: True
+    - require:
+      - user: rtorrent
+    - require_in:
+      - file: /home/rtorrent/.rtorrent.rc
+{% endfor %}
+{% endif %}
 
 /srv/media/torrents:
   file.directory:
@@ -57,18 +87,22 @@ rtorrent:
 
 /home/rtorrent/.rtorrent.rc:
   file.managed:
-    - source: salt://rtorrent/rtorrent.rc
+    - source: salt://rtorrent/rtorrent.rc.jinja
+    - template: jinja
     - user: root
     - group: root
     - mode: 644
     - makedirs: True
+    - contet:
+      xbmc_present: {{ xbmc_present }}
     - require:
       - pkg: rtorrent
       - user: rtorrent
       - file: /srv/media/torrents
       - file: /srv/torrent/watch
-      - file: /srv/torrent/process
+      - file: /srv/torrent/incomplete
       - file: /srv/torrent/sessions
+      - file: /srv/torrent/completed
     - watch_in:
       - service: rtorrent
 
