@@ -163,4 +163,7 @@ jarmon.config = {
     }
 };
 
-jQuery(document).ready( function() { jarmon.config.main(); } );
+jQuery(document).ready( function() {
+    jarmon.config.main();
+    setInterval(function() { jQuery('input[name="action"]').click() }, 3000000);
+} );
