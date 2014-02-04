@@ -29,8 +29,10 @@ kvm-pkgs:
   pkg.installed:
     - pkgs:
       - qemu-kvm
+      - qemu-system
       - bridge-utils
       - python-spice-client-gtk
+      - pm-utils
 
 network-manager:
   pkg.removed
@@ -57,19 +59,19 @@ network-manager:
     - before: 0
     - after: 5
     - limit: '^GRUB_HIDDEN_TIMEOUT='
-  file.sed:
-    - before: '""'
-    - after: '"intel_iommu=on"'
-    - limit: '^GRUB_CMDLINE_LINUX='
+#  file.sed:
+#    - before: '""'
+#    - after: '"intel_iommu=on"'
+#    - limit: '^GRUB_CMDLINE_LINUX='
 
-/etc/modprobe.d/vfio_iommu_type1.conf:
-  file.managed:
-    - user: root
-    - group: root
-    - mode: 644
-    - contents: options vfio_iommu_type1 allow_unsafe_interrupts=1
-    - require:
-      - pkg: kvm-pkgs
+#/etc/modprobe.d/vfio_iommu_type1.conf:
+#  file.managed:
+#    - user: root
+#    - group: root
+#    - mode: 644
+#    - contents: options vfio_iommu_type1 allow_unsafe_interrupts=1
+#    - require:
+#      - pkg: kvm-pkgs
 
 /etc/network/interfaces:
   file.managed:
@@ -77,5 +79,6 @@ network-manager:
     - user: root
     - group: root
     - mode: 644
+    - replace: False
     - require:
       - pkg: kvm-pkgs

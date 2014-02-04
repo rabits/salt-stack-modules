@@ -3,4 +3,4 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-root:{{ pillar['mail']['admin'] }}:{{ pillar['mail']['server'] }}:{{ pillar['mail']['port'] }}
+root:{{ salt['pillar.get']('mail:admin', 'root') }}:{{ salt['pillar.get']('mail:server', 'localhost') }}:{{ salt['pillar.get']('mail:port', '25') }}

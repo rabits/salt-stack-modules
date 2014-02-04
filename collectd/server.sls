@@ -6,7 +6,7 @@ include:
   - collectd
   - collectd.notify_email
 
-{{ pillar['monitoring']['rrd_dir'] }}:
+{{ salt['pillar.get']('monitoring:rrd_dir', '/srv/rrd') }}:
   file.directory:
     - user: root
     - group: www-data

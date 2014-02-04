@@ -3,7 +3,7 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-Port {{ pillar['net']['ssh_port'] }}
+Port {{ salt['pillar.get']('net:ssh_port', '22') }}
 Protocol 2
 
 HostKey /etc/ssh/ssh_host_rsa_key

@@ -60,8 +60,6 @@ collectd:
     - require:
       - pkg: collectd-core
       - pkg: libsensors4
-
-collectd:
   user.present:
     - gid: {{ salt['file.group_to_gid']('nogroup') }}
     - shell: /bin/false

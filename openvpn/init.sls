@@ -2,6 +2,9 @@
 # OpenVPN private network
 #
 
+include:
+  - openssl
+
 openvpn:
   pkg:
     - installed

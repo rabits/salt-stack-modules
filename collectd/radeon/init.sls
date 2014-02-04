@@ -2,6 +2,9 @@
 # Collectd plugin: radeon
 #
 
+include:
+  - gawk
+
 /usr/local/sbin/radeon_info.sh:
   file.managed:
     - source: salt://collectd/radeon/radeon_info.sh
@@ -10,6 +13,7 @@
     - mode: 755
     - require:
       - file: /etc/sudoers.d/collectd_radeon
+      - pkg: gawk
 
 /etc/collectd/collectd.d/radeon.conf:
   file.managed:

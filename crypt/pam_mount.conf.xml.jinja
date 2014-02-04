@@ -14,7 +14,7 @@
 
     <mkmountpoint enable="1" remove="true" />
 
-{% for user, mounts in pillar['crypt'][grains['nodename']].items() %}
+{% for user, mounts in salt['pillar.get']('crypt:%s'|format(grains['nodename']), {}).items() %}
 {%- for mountpoint, encrypteddisk in mounts.items() %}
     <volume user="{{ user }}" fstype="auto" path="{{ encrypteddisk }}" mountpoint="{{ mountpoint }}" options="fsck,noatime" />
 {%- endfor %}

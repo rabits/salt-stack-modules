@@ -3,11 +3,11 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-root={{ pillar['mail']['admin'] }}
-mailhub={{ pillar['mail']['server'] }}:{{ pillar['mail']['port'] }}
+root={{ salt['pillar.get']('mail:admin', 'root') }}
+mailhub={{ salt['pillar.get']('mail:server', 'localhost') }}:{{ salt['pillar.get']('mail:port', '25') }}
 UseTLS=YES
 UseSTARTTLS=YES
 AuthMethod=LOGIN
-AuthUser={{ pillar['mail']['account'] }}
-AuthPass={{ pillar['mail']['password'] }}
+AuthUser={{ salt['pillar.get']('mail:account', 'none') }}
+AuthPass={{ salt['pillar.get']('mail:password', 'none') }}
 FromLineOverride=YES

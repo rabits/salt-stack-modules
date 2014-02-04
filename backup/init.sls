@@ -20,7 +20,7 @@
 #    # cryptsetup luksClose backup_crypt
 #  8. Write nodename with parameters into pillar/backup.sls
 
-{% if grains['nodename'] in pillar['backup'] %}
+{% if grains['nodename'] in salt['pillar.get']('backup', {}) %}
 include:
   - rsync
   - lvm

@@ -19,10 +19,10 @@
 # 0 22 * * * /usr/local/bin/backup.sh 2>&1 | /usr/bin/logger -t BACKUP
 #
 
-BACKUP_FOLDERS='{% for folder in pillar['backup'][grains['nodename']]['folders'] %} {{ folder }}{% endfor %}'
+BACKUP_FOLDERS='{% for folder in salt['pillar.get']('backup:%s:folders'|format(grains['nodename']), []) %} {{ folder }}{% endfor %}'
 
-BACKUP_CRYPT={{ pillar['backup'][grains['nodename']]['disk'] }}
-BACKUP_CRYPT_KEY={{ pillar['backup'][grains['nodename']]['keyfile'] }}
+BACKUP_CRYPT={{ salt['pillar.get']('backup:%s:disk'|format(grains['nodename']), '') }}
+BACKUP_CRYPT_KEY={{ salt['pillar.get']('backup:%s:keyfile'|format(grains['nodename']), '') }}
 BACKUP_LVM_VG=backup
 BACKUP_LVM_DAILY=daily
 BACKUP_LVM_WEEKLY=weekly

@@ -6,7 +6,7 @@
 [raring64]
 description=Ubuntu Raring 13.04
 directory=/srv/schroot/raring64
-root-users={% for user in pillar['users'] %}{% if 'admin' in pillar['users'][user] and pillar['users'][user]['admin'] == True %}{{ user }},{% endif %}{% endfor %}
+root-users={% for user in salt['pillar.get']('users', {}) %}{% if salt['pillar.get']('users:%s:admin'|format(user), False) == True %}{{ user }},{% endif %}{% endfor %}
 type=directory
-users={{ pillar['users']|join(',') }}
+users={{ salt['pillar.get']('users', {})|join(',') }}
 profile=buildd

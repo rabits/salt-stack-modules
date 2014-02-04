@@ -4,6 +4,5 @@
 #
 
 [upsmon]
-  pass = MonPasswD14129
-  allowfrom = localhost
+  password = MonPasswD14129
   upsmon master

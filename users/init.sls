@@ -2,11 +2,12 @@
 # Users creation
 #
 
-{% for user, args in pillar['users'].items() %}
+{% for user, args in salt['pillar.get']('users', {}).items() %}
 {{ user }}:
   group:
     - present
   user.present:
+    - remove_groups: False
     - gid_from_name: True
 {% if 'fullname' in args %}
     - fullname: {{ args['fullname'] }}

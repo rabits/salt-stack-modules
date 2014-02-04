@@ -5,12 +5,12 @@
 
 server {
     listen   80;
-    server_name stat.{{ pillar['net']['main_domain'] }};
+    server_name stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }};
 
     allow 10.10.0.0/24;
     deny all;
 
-    root {{ pillar['monitoring']['stat_dir'] }};
+    root {{ salt['pillar.get']('monitoring:stat_dir', '/srv/www/stat') }};
     charset utf8;
     limit_conn perip 20;
     limit_conn perserver 150;
@@ -18,13 +18,13 @@ server {
     client_max_body_size 1m;
     client_body_buffer_size 128k;
 
-    access_log /var/log/nginx/access.stat.{{ pillar['net']['main_domain'] }}.log;
+    access_log /var/log/nginx/access.stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }}.log;
 
     location / {
     }
 
     location /rrd {
-        alias {{ pillar['monitoring']['rrd_dir'] }}/;
+        alias {{ salt['pillar.get']('monitoring:rrd_dir', '/srv/rrd') }}/;
         autoindex on;
     }
 

@@ -6,7 +6,7 @@
 FQDNLookup true
 
 Interval 60
-Timeout 4
+Timeout 20
 
 LoadPlugin syslog
 <Plugin syslog>
@@ -15,23 +15,21 @@ LoadPlugin syslog
 
 LoadPlugin network
 <Plugin network>
-{%- if 'monitorserver' in pillar['net']['hosts'][grains['nodename']] %}
-    Listen "{{ pillar['net']['hosts'][grains['nodename']]['ip'] }}" "{{ pillar['monitoring']['port'] }}"
-{%- else %}
-    Server "{{ pillar['net']['main_domain'] }}" "{{ pillar['monitoring']['port'] }}"
-{%- endif %}
+{%- if 'monitorserver' in salt['pillar.get']('net:hosts:%s'|format(grains['nodename']), {}) %}
+    Listen "{{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['nodename']), 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
 </Plugin>
 
-{% if 'monitorserver' in pillar['net']['hosts'][grains['nodename']] %}
 LoadPlugin rrdtool
 <Plugin rrdtool>
-    DataDir "{{ pillar['monitoring']['rrd_dir'] }}"
+    DataDir "{{ salt['pillar.get']('monitoring:rrd_dir', '/srv/rrd') }}"
     CacheTimeout 1200
     CacheFlush 1800
     WritesPerSecond 40
     RandomTimeout 300
-</Plugin>
+{%- else %}
+    Server "{{ salt['pillar.get']('net:main_domain', 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
 {%- endif %}
+</Plugin>
 
 LoadPlugin cpu
 LoadPlugin cpufreq
@@ -80,26 +78,26 @@ LoadPlugin tail
     Instance "auth"
     <Match>
       Regex "sshd[^:]*: input_userauth_request: invalid user"
-      DSType "DeriveInc"
-      Type "derive"
+      DSType "GaugeInc"
+      Type "gauge"
       Instance "sshd-invalid_user"
     </Match>
     <Match>
       Regex "sshd[^:]*: Accepted password for"
-      DSType "DeriveInc"
-      Type "derive"
+      DSType "GaugeInc"
+      Type "gauge"
       Instance "sshd-accepted_password"
     </Match>
     <Match>
       Regex "sshd[^:]*: Accepted publickey for"
-      DSType "DeriveInc"
-      Type "derive"
+      DSType "GaugeInc"
+      Type "gauge"
       Instance "sshd-accepted_publickey"
     </Match>
     <Match>
       Regex "sshd[^:]*: Failed password for"
-      DSType "DeriveInc"
-      Type "derive"
+      DSType "GaugeInc"
+      Type "gauge"
       Instance "sshd-failed_password"
     </Match>
   </File>
@@ -109,7 +107,7 @@ LoadPlugin tcpconns
 <Plugin tcpconns>
   LocalPort "80"
   LocalPort "443"
-  LocalPort "{{ pillar['net']['ssh_port'] }}"
+  LocalPort "{{ salt['pillar.get']('net:ssh_port', '22') }}"
 </Plugin>
 
 Include "/etc/collectd/collectd.d/*.conf"

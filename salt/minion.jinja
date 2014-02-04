@@ -3,7 +3,7 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-master: ss.{{ pillar['net']['main_domain'] }}
+master: ss.{{ salt['pillar.get']('net:main_domain', 'localhost') }}
 master_port: 4506
 
 user: root

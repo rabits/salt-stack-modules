@@ -7,6 +7,6 @@
 127.0.1.1    {{ grains['fqdn'] }}
 
 # VPN hosts:
-{% for host, args in pillar['net']['hosts'].items() %}{% if grains['id'] != host and not 'hidden' in args %}
+{% for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if grains['id'] != host and not 'hidden' in args %}
 {{ args['ip'] }}    {{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
 {% endif %}{% endfor %}

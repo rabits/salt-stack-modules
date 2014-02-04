@@ -167,10 +167,10 @@ jarmon_modules['uptime'] = {
 jarmon_modules['tail'] = {
     type: 'Security',
     data: [
-        ['derive-sshd-invalid_user', 0, 'SSH Invalid User', '#'],
-        ['derive-sshd-failed_password', 0, 'SSH Failed Pwd', '#'],
-        ['derive-sshd-accepted_password', 0, 'SSH Accepted Pwd', '#'],
-        ['derive-sshd-accepted_publickey', 0, 'SSH Accepted Key', '#'],
+        ['counter-sshd-invalid_user', 0, 'SSH Invalid User', '#'],
+        ['counter-sshd-failed_password', 0, 'SSH Failed Pwd', '#'],
+        ['counter-sshd-accepted_password', 0, 'SSH Accepted Pwd', '#'],
+        ['counter-sshd-accepted_publickey', 0, 'SSH Accepted Key', '#'],
     ],
     options: jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS)
 }

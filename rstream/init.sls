@@ -12,6 +12,7 @@ rstream:
       - gstreamer1.0-plugins-good
       - gstreamer1.0-plugins-bad
       - gstreamer1.0-plugins-ugly
+      - gstreamer1.0-alsa
   file.managed:
     - name: /usr/local/bin/rstream.py
     - source: salt://rstream/src/rstream.py
@@ -85,3 +86,21 @@ rstream-{{ stream }}:
       - file: rstream
 {% endif %}
 {% endfor %}
+
+/usr/local/sbin/rstream_freespace.sh:
+  file.managed:
+    - source: salt://rstream/rstream_freespace.sh
+    - user: root
+    - group: root
+    - mode: 750
+    - require:
+      - file: rstream
+      - file: /srv/streams/archive
+
+/usr/local/sbin/rstream_freespace.sh 2>&1 | /usr/bin/logger -t ARCHIVE:
+  cron.present:
+    - user: root
+    - minute: 0
+    - hour: 4
+    - require:
+      - file: /usr/local/sbin/rstream_freespace.sh

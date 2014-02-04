@@ -7,15 +7,15 @@ client
 proto udp
 dev tun
 
-remote {{ pillar['openvpn']['host'] }}
-port {{ pillar['openvpn']['port'] }}
+remote {{ var_vpn_host }}
+port {{ var_vpn_port }}
 
-ca {{ pillar['ssl']['ca_crt'] }}
-cert {{ pillar['ssl']['certs'] }}/{{ grains['nodename'] }}.crt
-key {{ pillar['ssl']['keys'] }}/{{ grains['nodename'] }}.key
+ca {{ var_ca_crt }}
+cert {{ var_certs }}/{{ grains['nodename'] }}.crt
+key {{ var_keys }}/{{ grains['nodename'] }}.key
 
 tls-client
-tls-auth {{ pillar['ssl']['home'] }}/openvpn_ta.key 1
+tls-auth {{ var_vpn_ta }} 1
 auth MD5
 cipher BF-CBC
 

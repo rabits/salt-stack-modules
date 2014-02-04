@@ -165,5 +165,5 @@ jarmon.config = {
 
 jQuery(document).ready( function() {
     jarmon.config.main();
-    setInterval(function() { jQuery('input[name="action"]').click() }, 3000000);
+    setInterval(function() { jQuery('input[name="action"]').click() }, 300000);
 } );

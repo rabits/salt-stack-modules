@@ -3,22 +3,22 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-port {{ pillar['openvpn']['port'] }}
+port {{ var_vpn_port }}
 proto udp
 dev tun
 
-ca {{ pillar['ssl']['ca_crt'] }}
-cert {{ pillar['ssl']['certs'] }}/openvpn.crt
-key {{ pillar['ssl']['keys'] }}/openvpn.key
-dh {{ pillar['ssl']['home'] }}/dh2048.pem
+ca {{ var_ca_crt }}
+cert {{ var_vpn_cert }}
+key {{ var_vpn_key }}
+dh {{ var_dh }}
 
-client-config-dir {{ pillar['openvpn']['ccd'] }}
+client-config-dir {{ var_vpn_ccd }}
 
 server 10.10.0.0 255.255.255.0
 route 192.168.0.0 255.255.255.0
 
 tls-server
-tls-auth {{ pillar['ssl']['home'] }}/openvpn_ta.key 0
+tls-auth {{ var_vpn_ta }} 0
 tls-timeout 120
 auth MD5
 cipher BF-CBC

@@ -5,7 +5,7 @@
 include:
   - nginx
 
-{{ pillar['monitoring']['stat_dir'] }}:
+{{ salt['pillar.get']('monitoring:stat_dir', '/srv/www/stat') }}:
   file.recurse:
     - source: salt://jarmon/jarmon-11.8
     - user: root
@@ -14,7 +14,7 @@ include:
     - dir_mode: 750
     - file_mode: 640
 
-/etc/nginx/sites-available/stat.{{ pillar['net']['main_domain'] }}.conf:
+/etc/nginx/sites-available/stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }}.conf:
   file.managed:
     - source: salt://jarmon/stat.nginx.conf.jinja
     - template: jinja
@@ -26,8 +26,8 @@ include:
     - watch_in:
       - service: nginx
 
-/etc/nginx/sites-enabled/stat.{{ pillar['net']['main_domain'] }}.conf:
+/etc/nginx/sites-enabled/stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }}.conf:
   file.symlink:
-    - target: /etc/nginx/sites-available/stat.{{ pillar['net']['main_domain'] }}.conf
+    - target: /etc/nginx/sites-available/stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }}.conf
     - watch_in:
       - service: nginx

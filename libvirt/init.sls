@@ -13,8 +13,8 @@ libvirt-pkgs:
       - virtinst
       - virt-viewer
 
-{% for user in pillar['users'] %}
-{% if 'admin' in pillar['users'][user] and pillar['users'][user]['admin'] == True %}
+{% for user in salt['pillar.get']('users', {}) %}
+{% if salt['pillar.get']('users:%s:admin'|format(user), False) == True %}
 extend:
   {{ user }}:
     user.present:
