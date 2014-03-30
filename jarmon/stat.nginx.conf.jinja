@@ -4,7 +4,7 @@
 #
 
 server {
-    listen   80;
+    listen   {{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['nodename']), '0.0.0.0') }}:80;
     server_name stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }};
 
     allow 192.168.0.0/20;
@@ -18,7 +18,7 @@ server {
     client_max_body_size 1m;
     client_body_buffer_size 128k;
 
-    access_log /var/log/nginx/access.stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }}.log;
+    access_log /var/log/nginx/access.{{ salt['pillar.get']('monitoring:conf_filename', 'stat') }}.log;
 
     location / {
     }
