@@ -14,8 +14,13 @@ dh {{ var_dh }}
 
 client-config-dir {{ var_vpn_ccd }}
 
-server 10.10.0.0 255.255.255.0
-route 192.168.0.0 255.255.255.0
+# Local networks from 192.168.0.0 to 192.168.15.0
+server {{ var_vpn_net }} 255.255.240.0
+
+# Client-Router networks:
+{%- for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if 'route' in args %}
+route {{ args['route'] }} {{ var_vpn_mask }} {{ var_vpn_ip }} # {{ host }} subnetwork
+{%- endif %}{% endfor %}
 
 tls-server
 tls-auth {{ var_vpn_ta }} 0

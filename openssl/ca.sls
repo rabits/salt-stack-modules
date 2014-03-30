@@ -111,6 +111,27 @@ openssl dhparam -out {{ var_dh }} 2048:
     - require:
       - file: {{ var_ssl_home }}
 
+/usr/local/bin/certscheck.sh:
+  file.managed:
+    - source: salt://openssl/certscheck.sh.jinja
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 755
+    - context:
+      var_ca_crt: {{ var_ca_crt }}
+      var_certs: {{ var_certs }}
+    - require:
+      - file: {{ var_certs }}
+
+/usr/local/bin/certscheck.sh 2>&1 | /usr/bin/logger -t CERTSCHECK:
+  cron.present:
+    - user: root
+    - minute: 0
+    - hour: 23
+    - require:
+      - file: /usr/local/bin/certscheck.sh
+
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}
 openssl req -config {{ var_ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ var_keys }}/{{ host }}.key -out {{ var_csrs }}/{{ host }}.csr -subj '/CN={{ host }}':
   cmd.run:

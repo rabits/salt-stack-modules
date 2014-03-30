@@ -63,4 +63,4 @@ def substring_search(what, where):
 
         salt '*' additional.substring_search 'Radeon' [{'model':'asd Radeon asdds'}]
     '''
-    return any(what in s['model'] for s in where)
+    return any(what in s['model'] for s in where) or any(what in s['vendor'] for s in where)

@@ -19,6 +19,9 @@
 #    # umount /dev/mapper/home && cryptsetup luksClose /dev/mapper/home
 #
 
+include:
+ - cryptsetup
+
 libpam-mount:
   pkg.installed
 

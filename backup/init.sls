@@ -32,7 +32,7 @@ include:
     - template: jinja
     - user: root
     - group: root
-    - mode: 750
+    - mode: 755
     - require:
       - pkg: rsync
       - pkg: lvm

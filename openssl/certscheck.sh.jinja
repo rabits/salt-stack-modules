@@ -1,0 +1,77 @@
+#!/bin/sh
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+# Check certificates on master server and send email to admin on:
+#  - Invalid
+#  - End date < 90 days
+#
+# Usage:
+#  # certscheck.sh
+#
+# Root Crontab:
+# # Certscheck
+# 0 23 * * * /usr/local/bin/certscheck.sh 2>&1 | /usr/bin/logger -t CERTSCHECK
+
+DEBUG=false
+warning_days=90 # Number of days to warn about soon-to-expire certs
+recipients="{{ salt['pillar.get']('mail:admin', '') }}"
+
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+
+ERROR=0
+subj="{{ grains['nodename'] }} CERTSCHECK error"
+msg="Hello from CERTSCHECK:\n"
+
+msg() {
+    echo "${1}"
+    msg="${msg}\n${1}"
+}
+
+for cert in {{ var_certs }}/*
+do
+    msg "${cert}: Checking cert"
+    output=$(openssl x509 -noout -in "${cert}" -dates 2>/dev/null) 
+
+    if [ "$?" -ne 0 ]; then
+        msg "${cert}:   Error getting info for cert"
+        ERROR=1
+        continue
+    fi
+
+    start_date=$(echo "${output}" | tr -d '\n' | sed 's/.*notBefore=\(.*\).*not.*/\1/g')
+    end_date=$(echo "${output}" | tr -d '\n' | sed 's/.*notAfter=\(.*\)$/\1/g')
+
+    start_epoch=$(date +%s -d "$start_date")
+    end_epoch=$(date +%s -d "$end_date")
+
+    epoch_now=$(date +%s)
+
+    if [ "$start_epoch" -gt "$epoch_now" ]; then
+        msg "${cert}:   - is not yet valid"
+        ERROR=1
+    fi
+
+    seconds_to_expire=$(($end_epoch - $epoch_now))
+    days_to_expire=$(($seconds_to_expire / 86400))
+
+    msg "${cert}:   * days to expire: $days_to_expire"
+
+    warning_seconds=$((86400 * $warning_days))
+
+    if [ "$seconds_to_expire" -lt "$warning_seconds" ]; then
+        msg "${cert}:   - is soon to expire ($seconds_to_expire seconds)"
+        ERROR=1
+    fi
+done
+
+if [ ${ERROR} -gt 0 ]
+then
+    echo "${msg}" | mail -s "${subj}" ${recipients}
+    if [ "$?" -ne 0 ]; then
+        echo "Error: mail was not sent"
+    else
+        echo "Mail was sent"
+    fi
+fi

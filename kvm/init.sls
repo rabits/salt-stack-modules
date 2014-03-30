@@ -34,9 +34,6 @@ kvm-pkgs:
       - python-spice-client-gtk
       - pm-utils
 
-network-manager:
-  pkg.removed
-
 /srv/kvm:
   file.directory:
     - user: root
@@ -82,3 +79,6 @@ network-manager:
     - replace: False
     - require:
       - pkg: kvm-pkgs
+
+#network-manager:
+#  pkg.removed

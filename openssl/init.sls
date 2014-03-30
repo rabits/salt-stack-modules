@@ -13,6 +13,7 @@
 {% set var_newcerts   = salt['pillar.get']('ssl:newcerts', var_ssl_home+'/newcerts') %}
 {% set var_csrs       = salt['pillar.get']('ssl:csrs', var_ssl_home+'/csrs') %}
 {% set var_crls       = salt['pillar.get']('ssl:crls', var_ssl_home+'/crls') %}
+{% set var_dh         = var_ssl_home + '/dh2048.pem' %}
 
 openssl:
   pkg.installed

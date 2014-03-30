@@ -16,4 +16,8 @@ respawn
 setuid rstream
 setgid rstream
 
-exec /usr/local/bin/rstream.py -v "{{ salt['pillar.get']('rstream:streams:%s:url'|format(stream), 'rtsp://localhost') }}"{% for var, val in salt['pillar.get']('rstream:streams:%s'|format(stream), {}).items() %}{% if var in ['audio', 'output-dir', 'file-name', 'duration-limit', 'reset-url', 'log-file'] %} --{{ var }} '{{ val }}'{% endif %}{% endfor %}
+{%- if salt['pillar.get']('rstream:streams:%s:debug'|format(stream), False) %}
+env GST_DEBUG=*:4
+export GST_DEBUG
+{% endif %}
+exec /usr/local/bin/rstream.py -v -c /srv/streams/conf/rstream-{{ stream }}.ini

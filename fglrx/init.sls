@@ -11,6 +11,11 @@ fglrx xorg.conf:
     - name: aticonfig --initial -f
     - unless: test -f /etc/X11/xorg.conf
 
+amdconfig --set-pcs-str="DDX,EnableRandR12,FALSE":
+  cmd.wait:
+    - watch:
+      - cmd: fglrx xorg.conf
+
 aticonfig --set-pcs-u32=MCIL,HWUVD_H264Level51Support,1:
   cmd.wait:
     - watch:
@@ -25,3 +30,4 @@ aticonfig --set-pcs-val=MCIL,DigitalHDTVDefaultUnderscan,0:
   cmd.wait:
     - watch:
       - cmd: fglrx xorg.conf
+

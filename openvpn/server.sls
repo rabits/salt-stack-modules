@@ -29,6 +29,10 @@ include:
 {% set var_vpn_cert = var_certs + '/openvpn.crt' %}
 {% set var_vpn_csr  = var_csrs + '/openvpn.csr' %}
 
+{% set var_vpn_ip = salt['pillar.get']('openvpn:ip', '192.168.0.1') %}
+{% set var_vpn_net = salt['pillar.get']('openvpn:net', '192.168.0.0') %}
+{% set var_vpn_mask = salt['pillar.get']('openvpn:mask', '255.255.255.0') %}
+
 openvpn --genkey --secret {{ var_vpn_ta }}:
   cmd.run:
     - unless: test -f {{ var_vpn_ta }}
@@ -67,6 +71,9 @@ openssl req -config {{ var_ca_config }} -extensions server -new -newkey 'rsa:204
       var_vpn_key: {{ var_vpn_key }}
       var_vpn_ta: {{ var_vpn_ta }}
       var_vpn_ccd: {{ var_vpn_ccd }}
+      var_vpn_ip: {{ var_vpn_ip }}
+      var_vpn_net: {{ var_vpn_net }}
+      var_vpn_mask: {{ var_vpn_mask }}
       var_ca_crt: {{ var_ca_crt }}
       var_ssl_home: {{ var_ssl_home }}
       var_certs: {{ var_certs }}
@@ -95,8 +102,8 @@ openssl req -config {{ var_ca_config }} -extensions server -new -newkey 'rsa:204
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if not 'vpnserver' in args %}
 {{ var_vpn_ccd }}/{{ host }}:
   file.managed:
+    - contents: "ifconfig-push {{ args['ip'] }} {{ var_vpn_ip }}{% if 'route' in args %}\niroute {{ args['route'] }} {{ var_vpn_mask }}{% endif %}\n"
     - user: root
     - group: root
     - mode: 644
-    - contents: ifconfig-push {{ args['ip'] }} 10.10.0.1
 {% endif %}{% endfor %}
