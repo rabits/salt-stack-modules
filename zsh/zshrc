@@ -184,7 +184,7 @@ alias ispell='ispell -d russian'
 alias -g G='|egrep --color=always -n'
 alias -g GR='egrep --color=always -R -n'
 alias em="emacs --no-desktop -nw "
-alias scr="tmux attach"
+alias scr="TERM=rxvt-unicode-256color tmux attach"
 alias x="extract"
 
 # ls settings (this is used for completion stuff)

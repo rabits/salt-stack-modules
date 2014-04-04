@@ -9,7 +9,7 @@ ret_port: 4506
 
 user: salt-stack
 max_open_files: 100000
-worker_threads: 4
+worker_threads: 2
 
 verify_env: True
 keep_jobs: 24

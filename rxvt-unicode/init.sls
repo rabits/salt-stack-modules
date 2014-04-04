@@ -2,7 +2,7 @@
 # RXVT Terminal emulator + terminus font
 #
 
-rxvt-unicode:
+rxvt-unicode-256color:
   pkg.installed
 
 xfonts-terminus:
@@ -14,4 +14,4 @@ x-terminal-emulator:
     - path: /usr/bin/urxvt
     - priority: 100
     - require:
-      - pkg: rxvt-unicode
+      - pkg: rxvt-unicode-256color
