@@ -40,7 +40,7 @@ master:
     - salt
     - htop
     - git
-    - byobu
+    - tmux
     - zsh
     - zip
     - rar
