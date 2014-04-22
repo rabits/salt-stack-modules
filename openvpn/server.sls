@@ -4,9 +4,6 @@
 # Do not forget to sign opencsr!
 #
 
-include:
-  - openvpn
-
 {% set var_ssl_home   = salt['pillar.get']('ssl:home', '/srv/ssl') %}
 {% set var_ca         = salt['pillar.get']('ssl:ca', var_ssl_home+'/ca') %}
 {% set var_ca_key     = salt['pillar.get']('ssl:ca_key', var_ca+'/ca.key') %}
@@ -32,6 +29,13 @@ include:
 {% set var_vpn_ip = salt['pillar.get']('openvpn:ip', '192.168.0.1') %}
 {% set var_vpn_net = salt['pillar.get']('openvpn:net', '192.168.0.0') %}
 {% set var_vpn_mask = salt['pillar.get']('openvpn:mask', '255.255.255.0') %}
+
+include:
+  - openvpn
+{%- if var_vpn_port <= 1024 %}
+  - libcap2
+{%- endif %}
+
 
 openvpn --genkey --secret {{ var_vpn_ta }}:
   cmd.run:
@@ -92,6 +96,17 @@ openssl req -config {{ var_ca_config }} -extensions server -new -newkey 'rsa:204
       - file: /etc/openvpn/server.conf
     - watch_in:
       - service: openvpn
+
+{% if var_vpn_port <= 1024 -%}
+setcap 'cap_net_bind_service=+ep' /usr/sbin/openvpn:
+  cmd.run:
+    - unless: getcap /usr/sbin/openvpn | grep -q 'cap_net_bind_service+ep'
+    - require:
+      - pkg: openssl
+      - pkg: libcap2
+    - require_in:
+      - service: openvpn
+{%- endif %}
 
 {{ var_vpn_ccd }}:
   file.directory:
