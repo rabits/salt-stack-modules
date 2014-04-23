@@ -23,20 +23,9 @@
 include:
   - openssl
 
-{% set var_ssl_home   = salt['pillar.get']('ssl:home', '/srv/ssl') %}
-{% set var_ca         = salt['pillar.get']('ssl:ca', var_ssl_home+'/ca') %}
-{% set var_ca_key     = salt['pillar.get']('ssl:ca_key', var_ca+'/ca.key') %}
-{% set var_ca_crt     = salt['pillar.get']('ssl:ca_crt', var_ca+'/ca.crt') %}
-{% set var_ca_config  = salt['pillar.get']('ssl:ca_config', var_ca+'/ca.config') %}
-{% set var_crl        = salt['pillar.get']('ssl:crl', var_ca+'/crl.pem') %}
-{% set var_keys       = salt['pillar.get']('ssl:keys', var_ssl_home+'/keys') %}
-{% set var_certs      = salt['pillar.get']('ssl:certs', var_ssl_home+'/certs') %}
-{% set var_newcerts   = salt['pillar.get']('ssl:newcerts', var_ssl_home+'/newcerts') %}
-{% set var_csrs       = salt['pillar.get']('ssl:csrs', var_ssl_home+'/csrs') %}
-{% set var_crls       = salt['pillar.get']('ssl:crls', var_ssl_home+'/crls') %}
-{% set var_dh         = var_ssl_home + '/dh2048.pem' %}
+{% import 'openssl/vars.sls' as ssl with context %}
 
-{{ var_ca_config }}:
+{{ ssl.ca_config }}:
   file.managed:
     - source: salt://openssl/ca.config.jinja
     - template: jinja
@@ -44,33 +33,33 @@ include:
     - group: root
     - mode: 640
     - context:
-      var_ca: {{ var_ca }}
-      var_ca_key: {{ var_ca_key }}
-      var_ca_crt: {{ var_ca_crt }}
-      var_crl: {{ var_crl }}
-      var_certs: {{ var_certs }}
-      var_newcerts: {{ var_newcerts }}
-      var_crls: {{ var_crls }}
+      ssl_ca: {{ ssl.ca }}
+      ssl_ca_key: {{ ssl.ca_key }}
+      ssl_ca_crt: {{ ssl.ca_crt }}
+      ssl_crl: {{ ssl.crl }}
+      ssl_certs: {{ ssl.certs }}
+      ssl_newcerts: {{ ssl.newcerts }}
+      ssl_crls: {{ ssl.crls }}
     - require:
-      - file: {{ var_ca }}
+      - file: {{ ssl.ca }}
 
-{{ var_ca }}/db:
+{{ ssl.ca }}/db:
   file.directory:
     - user: root
     - group: root
     - mode: 750
     - require:
-      - file: {{ var_ca }}
+      - file: {{ ssl.ca }}
 
-{{ var_ca }}/db/index.txt:
+{{ ssl.ca }}/db/index.txt:
   file.managed:
     - user: root
     - group: root
     - mode: 644
     - require:
-      - file: {{ var_ca }}/db
+      - file: {{ ssl.ca }}/db
 
-{{ var_ca }}/db/serial:
+{{ ssl.ca }}/db/serial:
   file.managed:
     - user: root
     - group: root
@@ -78,38 +67,38 @@ include:
     - replace: False
     - contents: '01'
     - require:
-      - file: {{ var_ca }}/db
+      - file: {{ ssl.ca }}/db
 
-{{ var_newcerts }}:
+{{ ssl.newcerts }}:
   file.directory:
     - user: root
     - group: root
     - mode: 750
     - require:
-      - file: {{ var_ssl_home }}
+      - file: {{ ssl.home }}
 
-openssl dhparam -out {{ var_dh }} 2048:
+openssl dhparam -out {{ ssl.dh }} 2048:
   cmd.run:
-    - unless: test -f {{ var_dh }}
+    - unless: test -f {{ ssl.dh }}
     - require:
       - pkg: openssl
-      - file: {{ var_ssl_home }}
+      - file: {{ ssl.home }}
 
-{{ var_csrs }}:
+{{ ssl.csrs }}:
   file.directory:
     - user: root
     - group: root
     - mode: 755
     - require:
-      - file: {{ var_ssl_home }}
+      - file: {{ ssl.home }}
 
-{{ var_crls }}:
+{{ ssl.crls }}:
   file.directory:
     - user: root
     - group: root
     - mode: 755
     - require:
-      - file: {{ var_ssl_home }}
+      - file: {{ ssl.home }}
 
 /usr/local/bin/certscheck.sh:
   file.managed:
@@ -119,10 +108,10 @@ openssl dhparam -out {{ var_dh }} 2048:
     - group: root
     - mode: 755
     - context:
-      var_ca_crt: {{ var_ca_crt }}
-      var_certs: {{ var_certs }}
+      ssl_ca_crt: {{ ssl.ca_crt }}
+      ssl_certs: {{ ssl.certs }}
     - require:
-      - file: {{ var_certs }}
+      - file: {{ ssl.certs }}
 
 /usr/local/bin/certscheck.sh 2>&1 | /usr/bin/logger -t CERTSCHECK:
   cron.present:
@@ -133,12 +122,12 @@ openssl dhparam -out {{ var_dh }} 2048:
       - file: /usr/local/bin/certscheck.sh
 
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}
-openssl req -config {{ var_ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ var_keys }}/{{ host }}.key -out {{ var_csrs }}/{{ host }}.csr -subj '/CN={{ host }}':
+openssl req -config {{ ssl.ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ ssl.keys }}/{{ host }}.key -out {{ ssl.csrs }}/{{ host }}.csr -subj '/CN={{ host }}':
   cmd.run:
-    - unless: test -f {{ var_csrs }}/{{ host }}.csr -o -f {{ var_certs }}/{{ host }}.crt
+    - unless: test -f {{ ssl.csrs }}/{{ host }}.csr -o -f {{ ssl.certs }}/{{ host }}.crt
     - require:
       - pkg: openssl
-      - file: {{ var_ca_config }}
+      - file: {{ ssl.ca_config }}
     - require_in:
       - file: /etc/openvpn/server.conf
 {% endfor %}

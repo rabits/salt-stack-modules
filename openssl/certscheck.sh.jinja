@@ -29,7 +29,7 @@ msg() {
     msg="${msg}\n${1}"
 }
 
-for cert in {{ var_certs }}/*
+for cert in {{ ssl_certs }}/*
 do
     msg "${cert}: Checking cert"
     output=$(openssl x509 -noout -in "${cert}" -dates 2>/dev/null) 

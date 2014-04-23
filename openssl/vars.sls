@@ -1,0 +1,12 @@
+{% set home       = salt['pillar.get']('ssl:home', '/srv/ssl') -%}
+{% set ca         = salt['pillar.get']('ssl:ca', home+'/ca') -%}
+{% set ca_key     = salt['pillar.get']('ssl:ca_key', ca+'/ca.key') -%}
+{% set ca_crt     = salt['pillar.get']('ssl:ca_crt', ca+'/ca.crt') -%}
+{% set ca_config  = salt['pillar.get']('ssl:ca_config', ca+'/ca.config') -%}
+{% set crl        = salt['pillar.get']('ssl:crl', ca+'/crl.pem') -%}
+{% set keys       = salt['pillar.get']('ssl:keys', home+'/keys') -%}
+{% set certs      = salt['pillar.get']('ssl:certs', home+'/certs') -%}
+{% set newcerts   = salt['pillar.get']('ssl:newcerts', home+'/newcerts') -%}
+{% set csrs       = salt['pillar.get']('ssl:csrs', home+'/csrs') -%}
+{% set crls       = salt['pillar.get']('ssl:crls', home+'/crls') -%}
+{% set dh         = home + '/dh2048.pem' -%}

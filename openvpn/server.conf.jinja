@@ -3,27 +3,27 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-port {{ var_vpn_port }}
+port {{ vpn_port }}
 proto udp
 dev tun
 
-ca {{ var_ca_crt }}
-cert {{ var_vpn_cert }}
-key {{ var_vpn_key }}
-dh {{ var_dh }}
+ca {{ ssl_ca_crt }}
+cert {{ vpn_cert }}
+key {{ vpn_key }}
+dh {{ ssl_dh }}
 
-client-config-dir {{ var_vpn_ccd }}
+client-config-dir {{ vpn_ccd }}
 
 # Local networks from 192.168.0.0 to 192.168.15.0
-server {{ var_vpn_net }} 255.255.240.0
+server {{ vpn_net }} 255.255.240.0
 
 # Client-Router networks:
 {%- for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if 'route' in args %}
-route {{ args['route'] }} {{ var_vpn_mask }} {{ var_vpn_ip }} # {{ host }} subnetwork
+route {{ args['route'] }} {{ vpn_mask }} {{ vpn_ip }} # {{ host }} subnetwork
 {%- endif %}{% endfor %}
 
 tls-server
-tls-auth {{ var_vpn_ta }} 0
+tls-auth {{ vpn_ta }} 0
 tls-timeout 120
 auth MD5
 cipher BF-CBC

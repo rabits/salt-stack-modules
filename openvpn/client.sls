@@ -7,32 +7,14 @@
 #
 
 {% if not 'vpnserver' in salt['pillar.get']('net:hosts:%s'|format(grains['nodename']), {}) %}
+
+{% import 'openssl/vars.sls' as ssl with context %}
+{% import 'openvpn/vars.sls' as vpn with context %}
+
 include:
   - openvpn
 
-{% set var_ssl_home   = salt['pillar.get']('ssl:home', '/srv/ssl') %}
-{% set var_ca         = salt['pillar.get']('ssl:ca', var_ssl_home+'/ca') %}
-{% set var_ca_key     = salt['pillar.get']('ssl:ca_key', var_ca+'/ca.key') %}
-{% set var_ca_crt     = salt['pillar.get']('ssl:ca_crt', var_ca+'/ca.crt') %}
-{% set var_ca_config  = salt['pillar.get']('ssl:ca_config', var_ca+'/ca.config') %}
-{% set var_crl        = salt['pillar.get']('ssl:crl', var_ca+'/crl.pem') %}
-{% set var_keys       = salt['pillar.get']('ssl:keys', var_ssl_home+'/keys') %}
-{% set var_certs      = salt['pillar.get']('ssl:certs', var_ssl_home+'/certs') %}
-{% set var_newcerts   = salt['pillar.get']('ssl:newcerts', var_ssl_home+'/newcerts') %}
-{% set var_csrs       = salt['pillar.get']('ssl:csrs', var_ssl_home+'/csrs') %}
-{% set var_crls       = salt['pillar.get']('ssl:crls', var_ssl_home+'/crls') %}
-{% set var_dh         = var_ssl_home + '/dh2048.pem' %}
-
-{% set var_vpn_host = salt['pillar.get']('openvpn:host', 'localhost') %}
-{% set var_vpn_port = salt['pillar.get']('openvpn:port', '1194') %}
-{% set var_vpn_ccd  = salt['pillar.get']('openvpn:ccd', '/etc/openvpn/ccd') %}
-
-{% set var_vpn_ta   = var_ssl_home + '/openvpn_ta.key' %}
-{% set var_vpn_key  = var_keys + '/openvpn.key' %}
-{% set var_vpn_cert = var_certs + '/openvpn.crt' %}
-{% set var_vpn_csr  = var_csrs + '/openvpn.csr' %}
-
-{{ var_vpn_ta }}:
+{{ vpn.ta }}:
   file.managed:
     - source: salt://openvpn_ta.key
     - user: root
@@ -50,12 +32,12 @@ include:
     - mode: 640
     - template: jinja
     - context:
-      var_vpn_host: {{ var_vpn_host }}
-      var_vpn_port: {{ var_vpn_port }}
-      var_vpn_ta: {{ var_vpn_ta }}
-      var_ca_crt: {{ var_ca_crt }}
-      var_certs: {{ var_certs }}
-      var_keys: {{ var_keys }}
+      vpn_host: {{ vpn.host }}
+      vpn_port: {{ vpn.port }}
+      vpn_ta: {{ vpn.ta }}
+      ssl_ca_crt: {{ ssl.ca_crt }}
+      ssl_certs: {{ ssl.certs }}
+      ssl_keys: {{ ssl.keys }}
     - require:
       - pkg: openvpn
     - watch_in:

@@ -7,18 +7,18 @@
 default_ca = CA_DEFAULT
 
 [CA_DEFAULT]
-dir       = {{ var_ca }}/db
+dir       = {{ ssl_ca }}/db
 database  = $dir/index.txt
 serial    = $dir/serial
 RANDFILE  = $dir/.rand
 
-certs         = {{ var_certs }}
-new_certs_dir = {{ var_newcerts }}
-crl_dir       = {{ var_crls }}
-crl           = {{ var_crl }}
+certs         = {{ ssl_certs }}
+new_certs_dir = {{ ssl_newcerts }}
+crl_dir       = {{ ssl_crls }}
+crl           = {{ ssl_crl }}
 
-certificate = {{ var_ca_crt }}
-private_key = {{ var_ca_key }}
+certificate = {{ ssl_ca_crt }}
+private_key = {{ ssl_ca_key }}
 
 x509_extensions = usr_cert
 
