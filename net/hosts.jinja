@@ -6,7 +6,9 @@
 127.0.0.1    localhost
 127.0.1.1    {{ grains['fqdn'] }}
 
+{% if salt['additional.state_in'](['openvpn.client']) or salt['additional.state_in'](['openvpn.server']) -%}
 # VPN hosts:
 {%- for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if grains['id'] != host and not 'hidden' in args %}
 {{ args['ip'] }}    {{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
 {%- endif %}{% endfor %}
+{%- endif %}

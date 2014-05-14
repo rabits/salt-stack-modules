@@ -1,0 +1,34 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+# Disable dhcp for all interfaces
+no-dhcp-interface={{ salt['grains.get']('ip_interfaces', ['lo'])|join(' ') }}
+
+listen-address=127.0.0.1
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:listen'|format(grains['nodename']), {}) -%}
+listen-address={{ ip }}
+{% endfor -%}
+
+no-resolv
+no-poll
+
+# Local VPN network
+local=/vpn/
+
+# Internal network routers
+{% for name in salt['pillar.get']('net:hosts', {}) -%}
+{% set router = salt['pillar.get']('net:hosts:%s'|format(name), {}) -%}
+{% if 'route' in router and 'ip' in router -%}
+# Router {{ name }} subnet
+server=/{{ name.split('.')[1:]|join('.') }}/{{ router['ip'] }}
+server=/{{ router['route'].split('.')[-2::-1]|join('.') }}.in-addr.arpa/{{ router['ip'] }}
+
+{% endif -%}
+{% endfor -%}
+
+# Other servers (ex. net provider dns nameservers)
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:servers'|format(grains['nodename']), {}) -%}
+server={{ ip }}
+{% endfor -%}

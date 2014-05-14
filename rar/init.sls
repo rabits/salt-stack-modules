@@ -1,9 +1,8 @@
 #
-# RAR packer & unpacker
+# RAR unpacker
 #
 
 rar-packages:
   pkg.installed:
     - pkgs:
-      - rar
-      - unrar
+      - unrar-free

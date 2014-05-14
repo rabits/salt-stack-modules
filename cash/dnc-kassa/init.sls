@@ -13,6 +13,8 @@ libpq5:
     - user: root
     - group: dnc
     - mode: 750
+    - require:
+      - group: dnc
 
 /etc/hwsrv:
   file.recurse:
@@ -21,6 +23,8 @@ libpq5:
     - group: dnc
     - dir_mode: 770
     - file_mode: 660
+    - require:
+      - group: dnc
     - require_in:
       - file: dnc
 
@@ -32,6 +36,7 @@ libpq5:
     - mode: 664
     - replace: False
     - require:
+      - group: dnc
       - file: /etc/hwsrv
     - require_in:
       - file: dnc
@@ -44,6 +49,7 @@ libpq5:
     - mode: 664
     - replace: False
     - require:
+      - group: dnc
       - file: /etc/hwsrv
     - require_in:
       - file: dnc

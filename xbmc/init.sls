@@ -5,6 +5,7 @@
 include:
   - sensors
   - fglrx
+  - acestream
 
 # Radeon repo
 xbmc-xvba-repo:

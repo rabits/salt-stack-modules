@@ -12,11 +12,13 @@ steam-repo:
    - keyserver: keyserver.ubuntu.com
    - require:
      - cmd: arch
-   - require_in:
-     - pkg: steam
 
 steam:
-  pkg.installed
+  pkg.installed:
+    - require:
+      - pkgrepo: steam-repo
 
 steam-launcher:
-  pkg.installed
+  pkg.installed:
+    - require:
+      - pkgrepo: steam-repo
