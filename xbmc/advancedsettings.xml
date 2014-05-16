@@ -1,3 +1,14 @@
-<advancedsettings> 
-  <cputempcommand>sensors|sed -ne "s/CPUTIN: \+[-+]\([0-9]\+\).*/\1 C/p"</cputempcommand> 
+<advancedsettings>
+    <network>
+        <cachemembuffersize>20971520</cachemembuffersize>
+        <curlclienttimeout>45</curlclienttimeout>
+    </network>
+    <gui> 
+        <algorithmdirtyregions>3</algorithmdirtyregions>
+        <nofliptimeout>0</nofliptimeout>
+    </gui>
+    <videoscanner>
+        <ignoreerrors>true</ignoreerrors>
+    </videoscanner>
+    <cputempcommand>sensors|sed -ne "s/CPUTIN: \+[-+]\([0-9]\+\).*/\1 C/p"</cputempcommand> 
 </advancedsettings>

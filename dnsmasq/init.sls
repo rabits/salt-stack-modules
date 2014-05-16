@@ -6,6 +6,8 @@ dnsmasq:
   pkg:
     - installed
   service.running:
+    - watch:
+      - file: /etc/hosts
     - require:
       - pkg: dnsmasq
 

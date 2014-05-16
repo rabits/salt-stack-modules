@@ -1,3 +1,6 @@
 [submodule "rstream/src"]
 	path = rstream/src
 	url = https://github.com/rabits/rstream.git
+[submodule "acestream/aceproxy"]
+	path = acestream/aceproxy
+	url = https://github.com/ValdikSS/aceproxy

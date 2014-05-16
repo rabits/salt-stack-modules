@@ -33,6 +33,7 @@ xbmc:
       - user: xbmc
     - watch:
       - pkg: xbmc
+      - file: /etc/init/xbmc.conf
 
 linux-sound-base:
   pkg.installed:
@@ -72,7 +73,6 @@ xinit:
       - user: xbmc
     - watch_in:
       - file: /etc/asound.conf
-      - service: xbmc
 
 /etc/X11/Xwrapper.config:
   file.managed:

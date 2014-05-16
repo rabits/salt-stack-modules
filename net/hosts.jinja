@@ -4,7 +4,9 @@
 #
 
 127.0.0.1    localhost
-127.0.1.1    {{ grains['fqdn'] }}
+{%- for int in salt['grains.get']('hwaddr_interfaces', []) if int != 'lo' %}
+{{ salt['grains.get']('ip_interfaces:%s'|format(int), '')|first() }}    {{ grains['fqdn'] }}
+{%- endfor %}
 
 {% if salt['additional.state_in'](['openvpn.client']) or salt['additional.state_in'](['openvpn.server']) -%}
 # VPN hosts:

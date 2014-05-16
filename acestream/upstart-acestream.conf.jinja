@@ -1,0 +1,14 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "AceStream engine startup script"
+author      "asavah"
+
+start on (local-filesystems{% for int in salt['grains.get']('hwaddr_interfaces', []) if int != 'lo' %} and net-device-up IFACE={{ int }}{% endfor %})
+stop on (local-filesystems{% for int in salt['grains.get']('hwaddr_interfaces', []) if int != 'lo' %} or net-device-up IFACE={{ int }}{% endfor %})
+
+setuid acestream
+
+exec acestreamengine --client-console --live-buffer 30 --cache-limit 20

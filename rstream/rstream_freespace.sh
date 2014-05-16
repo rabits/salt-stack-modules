@@ -12,7 +12,7 @@ export ARCHIVE="/srv/streams/archive"
 for i in $(seq 1 6)
 do
     available_space=$(df -P "${ARCHIVE}" | tail -1 | awk '{ print $4 }')
-    if [ "${available_space}" -lt "$((1024*1024*200))" ]
+    if [ "${available_space}" -lt "$((1024*1024*150))" ]
     then
         item=$(ls -rt "$ARCHIVE" | grep -v log | head -1)
         echo "RSTREAM: Available space in /srv - $(($available_space/1024/1025))GB, we need to remove old data '$ARCHIVE/$item'"

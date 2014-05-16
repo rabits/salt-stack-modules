@@ -2,6 +2,9 @@
 # TMux - advanced terminal multiplexer
 #
 
+include:
+  - sysstat
+
 tmux:
   pkg.installed
 
@@ -31,6 +34,7 @@ tmux:
     - mode: 755
     - require:
       - file: /etc/tmux
+      - pkg: sysstat
 
 /etc/tmux/mem.sh:
   file.managed:

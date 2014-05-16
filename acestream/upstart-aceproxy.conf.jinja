@@ -1,0 +1,14 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "AceProxy startup script"
+author      "asavah"
+
+start on (started acestream and started acevlc)
+stop on (stopping acestream or stopped acevlc)
+
+setuid acestream
+
+exec python2 /srv/aceproxy/acehttp.py
