@@ -6,7 +6,8 @@
 IF=$1
 if [ -z "$IF" ]
 then
-    {%- for int in salt['grains.get']('hwaddr_interfaces', ['eth0']) if int != 'lo' %}
+    {%- set default_ip = salt['grains.get']('fqdn_ip4', ['127.0.0.1']) %}
+    {%- for int, ip in salt['grains.get']('ip_interfaces', {'lo':'127.0.0.1'}).items() if ip == default_ip %}
     IF="{{ int }}"
     {%- endfor %}
 fi

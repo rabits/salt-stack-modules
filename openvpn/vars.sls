@@ -1,5 +1,7 @@
 {% import 'openssl/vars.sls' as ssl with context %}
 
+{% set instance = salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), 'none') -%}
+
 {% set host = salt['pillar.get']('openvpn:host', 'localhost') -%}
 {% set port = salt['pillar.get']('openvpn:port', '1194') -%}
 {% set ccd  = salt['pillar.get']('openvpn:ccd', '/etc/openvpn/ccd') -%}

@@ -37,18 +37,18 @@ openssl:
     - require:
       - file: {{ ssl.home }}
 
-{% if not 'vpnserver' in salt['pillar.get']('net:hosts:%s'|format(grains['nodename']), {}) %}
-{{ ssl.keys }}/{{ grains['nodename'] }}.key:
+{% if 'server' != salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), {}) %}
+{{ ssl.keys }}/{{ grains['id'] }}.key:
   file.managed:
-    - source: salt://keys/{{ grains['nodename'] }}.key
+    - source: salt://keys/{{ grains['id'] }}.key
     - user: root
     - group: root
     - mode: 640
     - makedirs: True
 
-{{ ssl.certs }}/{{ grains['nodename'] }}.crt:
+{{ ssl.certs }}/{{ grains['id'] }}.crt:
   file.managed:
-    - source: salt://certs/{{ grains['nodename'] }}.crt
+    - source: salt://certs/{{ grains['id'] }}.crt
     - user: root
     - group: root
     - mode: 644

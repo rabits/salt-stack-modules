@@ -3,7 +3,7 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-Port {{ salt['pillar.get']('net:hosts:%s:ssh_port'|format(grains['nodename']), '22') }}
+Port {{ salt['pillar.get']('net:hosts:%s:ssh_port'|format(grains['id']), '22') }}
 Protocol 2
 
 HostKey /etc/ssh/ssh_host_rsa_key

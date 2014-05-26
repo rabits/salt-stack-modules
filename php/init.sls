@@ -12,6 +12,7 @@ php5:
     - pkgs:
       - php5-fpm
       - php5-common
+      - php-apc
   service.running:
     - name: php5-fpm
     - watch:

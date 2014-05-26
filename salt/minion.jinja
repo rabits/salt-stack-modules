@@ -6,6 +6,8 @@
 master: ss.{{ salt['pillar.get']('net:main_domain', 'localhost') }}
 master_port: 4506
 
+id: {{ salt['grains.get']('id', 'noname') }}
+
 user: root
 
 cache_jobs: True

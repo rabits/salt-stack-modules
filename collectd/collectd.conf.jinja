@@ -15,8 +15,8 @@ LoadPlugin syslog
 
 LoadPlugin network
 <Plugin network>
-{%- if 'monitorserver' in salt['pillar.get']('net:hosts:%s'|format(grains['nodename']), {}) %}
-    Listen "{{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['nodename']), 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
+{%- if 'monitorserver' in salt['pillar.get']('net:hosts:%s'|format(grains['id']), {}) %}
+    Listen "{{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['id']), 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
 </Plugin>
 
 LoadPlugin rrdtool

@@ -4,7 +4,7 @@
 #
 
 server {
-    listen   {{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['nodename']), '0.0.0.0') }}:80;
+    listen   {{ salt['pillar.get']('net:hosts:%s:ip'|format(grains['id']), '0.0.0.0') }}:80;
     server_name stat.{{ salt['pillar.get']('net:main_domain', 'localhost') }};
 
     allow 192.168.0.0/20;

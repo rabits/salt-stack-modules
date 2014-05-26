@@ -27,7 +27,7 @@ master:
   '*':
     - users
     - net
-    - openvpn.client
+    - openvpn
     - collectd
     - backup
 
@@ -53,7 +53,7 @@ master:
     - match: compound
     - lightdm
 
-  '<salt server nodename example>':
+  '<salt server nodeid example>':
     - salt.master
     - collectd.server
     - openssl.ca
@@ -62,7 +62,7 @@ master:
     - jarmon
     - squid
 
-  '<desktop nodename example>':
+  '<desktop nodeid example>':
     - awesome
     - rxvt-unicode
     - smplayer
@@ -130,13 +130,13 @@ base:
 # Don't forget to initialize backup partitions as described in master/backup/init.sls
 
 backup:
-  <nodename>:
+  <nodeid>:
     keyfile: <path to file with cryptsetup luks password>
     disk: <path to encrypted partition>
     folders:
       - <folder to backup>
       - <folder to backup>
-  <nodename>:
+  <nodeid>:
     keyfile: /home/backup.key
     disk: /dev/sdb
     folders:
@@ -183,14 +183,14 @@ net:
   main_domain: <main domain of network like example.com>
   ssh_port: {{ '222' if 'remote' in grains['roles'] else '22' }}
   hosts:
-    <nodename>:
-      vpnserver: True
+    <nodeid>:
+      vpn: server
       monitorserver: True
       hidden: True
       server: True
       ip: 10.10.0.1
 
-    <nodename>:
+    <nodeid>:
       server: True
       aliases:
         - <some alias for node in /etc/hosts>
@@ -255,13 +255,13 @@ users:
 #
 # Crypt automount folders on login configuration
 # Format:
-#   <nodename>:
+#   <nodeid>:
 #     <user>:
 #       <folder>: <disk>
 #
 
 crypt:
-  <nodename>:
+  <nodeid>:
     user:
       /home/user: /dev/mapper/vg-home-user
 ```

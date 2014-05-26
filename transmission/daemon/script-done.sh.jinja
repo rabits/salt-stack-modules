@@ -6,7 +6,9 @@
 HOST="127.0.0.1"
 PORT=8091
 USER="transmission"
-PASSWD="transmission"
+PASSWORD="transmission"
+
+echo "Starting torrent complete script: id#$TR_TORRENT_ID" | tee /tmp/transmission-script.log
 
 transmission-remote "$HOST:$PORT" -n "$USER:$PASSWORD" -t$TR_TORRENT_ID --stop
 {%- if xbmc_present %}
@@ -15,3 +17,5 @@ chgrp -R xbmc /srv/media/torrents/*
 chmod -R g+w /srv/media/torrents/*
 {%- endif %}
 transmission-remote "$HOST:$PORT" -n "$USER:$PASSWORD" -t$TR_TORRENT_ID --remove
+
+echo "Ending torrent complete script: id#$TR_TORRENT_ID" | tee /tmp/transmission-script.log

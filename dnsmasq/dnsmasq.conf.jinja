@@ -7,7 +7,7 @@
 no-dhcp-interface={{ salt['grains.get']('ip_interfaces', ['lo'])|join(' ') }}
 
 listen-address=127.0.0.1
-{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:listen'|format(grains['nodename']), {}) -%}
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:listen'|format(grains['id']), {}) -%}
 listen-address={{ ip }}
 {% endfor -%}
 
@@ -29,6 +29,6 @@ server=/{{ router['route'].split('.')[-2::-1]|join('.') }}.in-addr.arpa/{{ route
 {% endfor -%}
 
 # Other servers (ex. net provider dns nameservers)
-{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:servers'|format(grains['nodename']), {}) -%}
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:servers'|format(grains['id']), {}) -%}
 server={{ ip }}
 {% endfor -%}
