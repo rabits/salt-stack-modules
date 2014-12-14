@@ -1,0 +1,22 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+[quota]
+default = 20
+
+[network]
+port=10002
+
+[fileserver]
+port=10003
+
+{% if db_type != 'sqlite3' -%}
+[Database]
+type={{ db_type }}
+host={{ db_path }}
+user={{ db_user }}
+password={{ db_password }}
+db_name={{ db_name }}
+{%- endif %}

@@ -14,7 +14,7 @@ external_pid_file = '/var/run/postgresql/{{ version }}-main.pid'
 listen_addresses = '{{ listen }}'
 port = 5432
 max_connections = 100
-unix_socket_directory = '/var/run/postgresql'
+unix_socket_directories = '/var/run/postgresql'
 
 ssl = true
 

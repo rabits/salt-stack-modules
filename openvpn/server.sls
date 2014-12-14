@@ -52,7 +52,9 @@ setcap 'cap_net_bind_service=+ep' /usr/sbin/openvpn:
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if 'server' != args.vpn|default('none') %}
 {{ vpn.ccd }}/{{ host }}:
   file.managed:
-    - contents: "ifconfig-push {{ args['ip'] }} {{ vpn.ip }}{% if 'route' in args %}\niroute {{ args['route'] }} {{ vpn.mask }}{% endif %}\n"
+    - contents: |
+        ifconfig-push {{ args['ip'] }} {{ vpn.ip }}{% if 'route' in args %}
+        iroute {{ args['route'] }} {{ vpn.mask }}{% endif %}
     - user: root
     - group: root
     - mode: 644

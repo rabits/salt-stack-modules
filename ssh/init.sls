@@ -33,6 +33,8 @@ sftp:
     - present
   user.present:
     - gid_from_name: True
+    - system: True
+    - createhome: False
     - groups:
       - sftpusers
     - require:

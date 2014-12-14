@@ -5,7 +5,9 @@
 {% set ca_config  = salt['pillar.get']('ssl:ca_config', ca+'/ca.config') -%}
 {% set crl        = salt['pillar.get']('ssl:crl', ca+'/crl.pem') -%}
 {% set keys       = salt['pillar.get']('ssl:keys', home+'/keys') -%}
+{% set key        = keys + "/internal_" + salt['additional.inverse'](grains['id']) + '.key' %}
 {% set certs      = salt['pillar.get']('ssl:certs', home+'/certs') -%}
+{% set cert       = certs + "/internal_" + salt['additional.inverse'](grains['id']) + '.crt' %}
 {% set newcerts   = salt['pillar.get']('ssl:newcerts', home+'/newcerts') -%}
 {% set csrs       = salt['pillar.get']('ssl:csrs', home+'/csrs') -%}
 {% set crls       = salt['pillar.get']('ssl:crls', home+'/crls') -%}

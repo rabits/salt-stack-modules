@@ -1,0 +1,23 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "Gogs upstart script"
+author      "Rabit <home@rabits.org>"
+ 
+start on (local-filesystems and net-device-up)
+stop on shutdown
+ 
+respawn
+respawn limit 10 5
+  
+setuid {{ username }}
+setgid {{ username }}
+
+env HOME="{{ home_dir }}"
+env USER="{{ username }}"
+
+chdir {{ dist_dir }}
+
+exec {{ dist_dir }}/gogs web

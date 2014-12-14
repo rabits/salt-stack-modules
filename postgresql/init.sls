@@ -2,7 +2,7 @@
 # PostgreSQL relation database
 #
 
-{% set version = salt['pillar.get']('postgresql:'+grains['id']+':version', '9.1') %}
+{% set version = salt['pillar.get']('postgresql:'+grains['id']+':version', '9.3') %}
 {% set listen = salt['pillar.get']('postgresql:'+grains['id']+':listen', 'localhost') %}
 {% set access = salt['pillar.get']('postgresql:'+grains['id']+':access', '127.0.0.1/32') %}
 

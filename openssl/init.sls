@@ -38,17 +38,17 @@ openssl:
       - file: {{ ssl.home }}
 
 {% if 'server' != salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), {}) %}
-{{ ssl.keys }}/{{ grains['id'] }}.key:
+{{ ssl.key }}:
   file.managed:
-    - source: salt://keys/{{ grains['id'] }}.key
+    - source: salt://keys/{{ ssl.key.split('/')[-1] }}
     - user: root
     - group: root
     - mode: 640
     - makedirs: True
 
-{{ ssl.certs }}/{{ grains['id'] }}.crt:
+{{ ssl.cert }}:
   file.managed:
-    - source: salt://certs/{{ grains['id'] }}.crt
+    - source: salt://certs/{{ ssl.cert.split('/')[-1] }}
     - user: root
     - group: root
     - mode: 644

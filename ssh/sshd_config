@@ -33,15 +33,15 @@ PermitEmptyPasswords no
 
 ChallengeResponseAuthentication no
 
-PasswordAuthentication {{ 'no' if 'remote' in salt['grains.get']('roles', {}) else 'yes' }}
+PasswordAuthentication {{ 'no' if salt['pillar.get']('net:hosts:%s:access_from_outside'|format(grains['id']), False) else 'yes' }}
 
-X11Forwarding {{ 'yes' if 'desktop' in salt['grains.get']('roles', {}) else 'no' }}
+X11Forwarding no
 X11DisplayOffset 10
 PrintMotd no
 PrintLastLog yes
 TCPKeepAlive yes
 
-AcceptEnv LANG LC_*
+#AcceptEnv LANG LC_*
 
 UsePAM yes
 

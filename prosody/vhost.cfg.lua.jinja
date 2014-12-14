@@ -1,0 +1,15 @@
+--#
+--# WARNING:
+--# This file is under CM control - all manual changes will be removed
+--#
+
+-- Section for {{ host }}
+
+VirtualHost "{{ host }}"
+    enabled = true
+    ssl = {
+        key = "{{ ssl_key }}";
+        certificate = "{{ ssl_cert }}";
+    }
+
+Component "conference.{{ host }}" "muc"

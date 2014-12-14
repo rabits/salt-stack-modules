@@ -4,3 +4,6 @@
 
 awesome:
   pkg.installed
+
+light-locker:
+  pkg.installed

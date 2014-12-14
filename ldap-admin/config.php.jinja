@@ -1,0 +1,5 @@
+<?php
+// Set parameters
+$ldap_server   = 'ldap://127.0.0.1/';
+$ldap_domain   = 'dc={{ ',dc='.join(salt['pillar.get']('net:main_domain', 'localhost').split('.')) }}';
+$ldap_userbase = 'ou=Users,'.$ldap_domain;

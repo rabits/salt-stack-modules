@@ -20,4 +20,4 @@ setgid rstream
 env GST_DEBUG=*:4
 export GST_DEBUG
 {% endif %}
-exec /usr/local/bin/rstream.py -v -c /srv/streams/conf/rstream-{{ stream }}.ini
+exec /usr/local/bin/rstream.py -v --config-file /srv/streams/conf/rstream-{{ stream }}.ini

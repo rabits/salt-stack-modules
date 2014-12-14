@@ -1,0 +1,27 @@
+{{ home_dir }}/logs/seaf-server.log
+{
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    sharedscripts
+    postrotate
+        [ ! -f {{ home_dir }}/pids/seaf-server.pid ] || kill -USR1 `cat {{ home_dir }}/pids/seaf-server.pid`
+    endscript
+}
+
+{{ home_dir }}/logs/ccnet.log
+{
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    sharedscripts
+    postrotate
+        [ ! -f {{ home_dir }}/pids/ccnet.pid ] || kill -USR1 `cat {{ home_dir }}/pids/ccnet.pid`
+    endscript
+}

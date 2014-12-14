@@ -37,11 +37,11 @@
     - require:
       - group: {{ user }}
  
-{% if 'keys.pub' in args and args['keys.pub'] == True %}
-{{ user }}_key.pub:
-  ssh_auth:
-    - present
+{% if 'keys_pub' in args %}
+{%- for pubkey in args['keys_pub'] %}
+{{ pubkey }}:
+  ssh_auth.present:
     - user: {{ user }}
-    - names: {{ args['keys.pub'] }}
+{% endfor %}
 {% endif %}
 {% endfor %}

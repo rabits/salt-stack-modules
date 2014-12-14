@@ -1,0 +1,19 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+SECRET_KEY = "{{ secret_key }}"
+FILE_SERVER_ROOT = 'https://{{ domain }}/seafhttp'
+
+{% if db_type == 'pgsql' -%}
+DATABASES = {
+    'default': {
+        'ENGINE'   : 'django.db.backends.postgresql_psycopg2',
+        'NAME'     : '{{ db_name }}',
+        'USER'     : '{{ db_user }}',
+        'PASSWORD' : '{{ db_password }}',
+        'HOST'     : '{{ db_path }}',
+    }
+}
+{%- endif %}

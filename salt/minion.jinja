@@ -3,8 +3,8 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-master: ss.{{ salt['pillar.get']('net:main_domain', 'localhost') }}
-master_port: 4506
+master: {{ salt['config.option']('master') }}
+master_port: {{ salt['config.option']('master_port') }}
 
 id: {{ salt['grains.get']('id', 'noname') }}
 

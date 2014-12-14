@@ -3,12 +3,12 @@
 # This file is under CM control - all manual changes will be removed
 #
 
-127.0.0.1    localhost
-{{ salt['grains.get']('fqdn_ip4', ['127.0.1.1'])|first() }}    {{ grains['id'] }}
+127.0.0.1	localhost
+{{ salt['grains.get']('fqdn_ip4', ['127.0.1.1'])|first() }}	{{ grains['id'] }}
 
 {% if salt['additional.state_in'](['openvpn.server']) -%}
 # VPN hosts:
-{%- for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if grains['id'] != host and not 'hidden' in args %}
-{{ args['ip'] }}    {{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
+{%- for host, args in salt['pillar.get']('net:hosts', {})|dictsort %}{% if not 'hidden' in args %}
+{{ args['ip'] }}	{{ host }}.vpn{% if 'aliases' in args %}{% for alias in args['aliases'] %} {{ alias }}{% endfor %}{% endif %}
 {%- endif %}{% endfor %}
 {%- endif %}

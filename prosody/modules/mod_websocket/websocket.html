@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>XMPP Websocket</title>
+		<script type="text/javascript">
+			if ("WebSocket" in window) {
+				var ws = new WebSocket("ws://localhost:5280/xmpp-websocket/", "xmpp");
+				ws.onopen = function() {
+					ws.send("<stream:stream to='localhost' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
+				};
+				ws.onmessage = function (evt) {
+					var message = evt.data;
+					alert ("Received frame: " + message);
+				};
+				ws.onclose = function() {
+					alert ("Disconnected");
+				};
+			} else {
+				alert ("Your browser doesn't implement WebSocket !");
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

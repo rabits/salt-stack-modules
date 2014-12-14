@@ -1,0 +1,35 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+server {
+    listen   {{ nginx_listen }}:80;
+
+    server_name {{ nginx_server_name }};
+
+    allow 192.168.0.0/20;
+    deny all;
+
+    root {{ home_dir }};
+    charset utf8;
+    limit_conn perip 20;
+    limit_conn perserver 150;
+
+    client_max_body_size 1m;
+    client_body_buffer_size 128k;
+
+    access_log /var/log/nginx/access.{{ nginx_conf_name }}.log;
+    error_log  /var/log/nginx/error.{{ nginx_conf_name }}.log;
+
+    location / {
+    }
+
+    location /rrd {
+        alias {{ salt['pillar.get']('monitoring:rrd_dir', '/srv/rrd') }}/;
+        autoindex on;
+    }
+
+    include /etc/nginx/common.conf;
+}
+

@@ -1,0 +1,25 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "SeaFile server startup script"
+author      "Rabit <home@rabits.org>"
+
+start on net-device-up and local-filesystems
+stop on runlevel [!2345]
+
+kill signal INT
+
+setuid seafile
+setgid seafile
+
+pre-start script
+    {{ home_dir }}/seafile-server-latest/seafile.sh start
+    {{ home_dir }}/seafile-server-latest/seahub.sh start-fastcgi 8000
+end script
+
+post-stop script
+    {{ home_dir }}/seafile-server-latest/seafile.sh stop
+    {{ home_dir }}/seafile-server-latest/seahub.sh stop
+end script

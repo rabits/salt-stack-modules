@@ -9,7 +9,7 @@ videoaccel:
       - libva-glx1
 {% if salt['additional.substring_search']('Radeon', grains['gpus']) %}
       # Radeon XvBA
-      - xvba-va-driver
+      # We need xvba-va-driver (fglrx driver) or vdpau-va-driver (radeon_si driver)
 {% elif salt['additional.substring_search']('intel', grains['gpus']) %}
       # Intel vaapi
       - libva-intel-vaapi-driver

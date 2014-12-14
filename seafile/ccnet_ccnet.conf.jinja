@@ -1,0 +1,32 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+[General]
+USER_NAME = FileServer
+ID = 5d5c3b589e64322ce6c93af11d814e12e3283523
+NAME = FileServer
+SERVICE_URL = https://{{ domain }}
+
+[Network]
+PORT = 10001
+
+[Client]
+PORT = 13418
+
+{% if db_type != 'sqlite3' -%}
+[Database]
+ENGINE={{ db_type }}
+HOST={{ db_path }}
+USER={{ db_user }}
+PASSWD={{ db_password }}
+DB={{ db_name }}
+{%- endif %}
+
+{% if ldap_url != '' -%}
+[LDAP]
+HOST = {{ ldap_url }}
+BASE = {{ ldap_userbase }}
+LOGIN_ATTR = {{ ldap_attr }}
+{%- endif %}

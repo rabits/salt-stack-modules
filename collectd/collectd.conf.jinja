@@ -27,7 +27,7 @@ LoadPlugin rrdtool
     WritesPerSecond 40
     RandomTimeout 300
 {%- else %}
-    Server "{{ salt['pillar.get']('net:main_domain', 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
+    Server "{{ salt['pillar.get']('openvpn:ip', '192.168.0.1') if 'client' == salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), 'no') else salt['pillar.get']('net:main_domain', 'localhost') }}" "{{ salt['pillar.get']('monitoring:port', '4940') }}"
 {%- endif %}
 </Plugin>
 

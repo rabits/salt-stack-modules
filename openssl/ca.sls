@@ -122,12 +122,19 @@ openssl dhparam -out {{ ssl.dh }} 2048:
       - file: /usr/local/bin/certscheck.sh
 
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}
-openssl req -config {{ ssl.ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ ssl.keys }}/{{ host }}.key -out {{ ssl.csrs }}/{{ host }}.csr -subj '/CN={{ host }}':
+{% set file_name = "internal_" + salt['additional.inverse'](host) %}
+openssl req -config {{ ssl.ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ ssl.keys }}/{{ file_name }}.key -out {{ ssl.csrs }}/{{ file_name }}.csr -subj '/CN={{ host }}':
   cmd.run:
-    - unless: test -f {{ ssl.csrs }}/{{ host }}.csr -o -f {{ ssl.certs }}/{{ host }}.crt
+    - unless: test -f {{ ssl.csrs }}/{{ file_name }}.csr -o -f {{ ssl.certs }}/{{ file_name }}.crt
     - require:
       - pkg: openssl
       - file: {{ ssl.ca_config }}
     - require_in:
-      - file: /etc/openvpn/server.conf
+      - file: {{ ssl.keys }}/{{ file_name }}.key
+
+{{ ssl.keys }}/{{ file_name }}.key:
+  file.managed:
+    - user: root
+    - group: salt-stack
+    - mode: 640
 {% endfor %}

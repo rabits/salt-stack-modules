@@ -9,6 +9,7 @@ salt-stack:
   user.present:
     - home: /srv/salt
     - shell: /bin/nologin
+    - system: True
 
 salt-master:
   pkg:
@@ -20,9 +21,10 @@ salt-master:
 
 /etc/salt/master:
   file.managed:
-    - source: salt://salt/master
-    - user: salt-stack
-    - group: root
+    - source: salt://salt/master.jinja
+    - template: jinja
+    - user: root
+    - group: salt-stack
     - mode: 640
     - require:
       - pkg: salt-master

@@ -2,5 +2,6 @@
 # GIT scm
 #
 
-git:
-  pkg.installed
+git-package:
+  pkg.installed:
+    - name: git

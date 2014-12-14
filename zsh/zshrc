@@ -168,14 +168,16 @@ case `uname` in
                 bindkey '\e[1~' beginning-of-line
                 bindkey '\e[3~' delete-char
                 bindkey '\e[4~' end-of-line
-                bindkey '\177' backward-delete-char
+                bindkey '\177'  backward-delete-char
+                bindkey '^w'    backward-kill-word
                 bindkey '\e[2~' overwrite-mode
+                bindkey '^xe'   edit-command-line
                 
                 bindkey "\e[7~" beginning-of-line
-                bindkey "\e[H" beginning-of-line
+                bindkey "\e[H"  beginning-of-line
                 bindkey "\e[2~" transpose-words
                 bindkey "\e[8~" end-of-line
-                bindkey "\e[F" end-of-line
+                bindkey "\e[F"  end-of-line
                 ;;
         esac
         ;;
@@ -254,6 +256,8 @@ zstyle ":completion:*:*:kill:*:processes" list-colors "=(#b) #([0-9]#)*=0=01;32"
 zstyle ":completion:*:cd:*" ignore-parents parent pwd
 
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+bindkey '^R' history-incremental-search-backward
 
 setopt \
         print_exit_value \

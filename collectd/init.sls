@@ -65,3 +65,4 @@ collectd:
     - gid: {{ salt['file.group_to_gid']('nogroup') }}
     - shell: /bin/false
     - createhome: False
+    - system: True

@@ -1,6 +1,7 @@
 {% import 'openssl/vars.sls' as ssl with context %}
 
-{% set instance = salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), 'none') -%}
+{% set autorun = salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), 'no') -%}
+{% set instance = salt['pillar.get']('net:hosts:%s:vpn'|format(grains['id']), 'client') -%}
 
 {% set host = salt['pillar.get']('openvpn:host', 'localhost') -%}
 {% set port = salt['pillar.get']('openvpn:port', '1194') -%}

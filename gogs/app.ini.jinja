@@ -1,0 +1,192 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+APP_NAME = Gogs: Go Git Service
+RUN_USER = {{ username }}
+RUN_MODE = prod
+
+[repository]
+ROOT = {{ home_dir }}
+SCRIPT_TYPE = sh
+
+[server]
+PROTOCOL = http
+DOMAIN = {{ domain }}
+ROOT_URL = https://{{ domain }}/
+HTTP_ADDR = 127.0.0.1
+HTTP_PORT = 3000
+SSH_PORT = {{ salt['pillar.get']('net:hosts:%s:ssh_port'|format(grains['id']), '22') }}
+OFFLINE_MODE = false
+DISABLE_ROUTER_LOG = false
+CERT_FILE = 
+KEY_FILE = 
+STATIC_ROOT_PATH = 
+ENABLE_GZIP = false
+LANDING_PAGE = home
+
+[database]
+; Either "mysql", "postgres" or "sqlite3", it's your choice
+DB_TYPE = {{ db_type }}
+HOST = {{ db_path }}
+NAME = {{ db_name }}
+USER = {{ db_user }}
+PASSWD = {{ db_password }}
+SSL_MODE = require
+PATH = {{ db_path }}
+
+[admin]
+
+[security]
+INSTALL_LOCK = true
+SECRET_KEY = {{ salt['grains.get_or_set_hash']('gogs:instance', 32) }}
+LOGIN_REMEMBER_DAYS = 7
+COOKIE_USERNAME = gogs_be
+COOKIE_REMEMBER_NAME = gogs_cool
+REVERSE_PROXY_AUTHENTICATION_USER = X-WEBAUTH-USER
+
+[service]
+ACTIVE_CODE_LIVE_MINUTES = 180
+RESET_PASSWD_CODE_LIVE_MINUTES = 180
+REGISTER_EMAIL_CONFIRM = false
+DISABLE_REGISTRATION = true
+REQUIRE_SIGNIN_VIEW = true
+ENABLE_CACHE_AVATAR = false
+ENABLE_NOTIFY_MAIL = false
+ENABLE_REVERSE_PROXY_AUTHENTICATION = false
+ENABLE_REVERSE_PROXY_AUTO_REGISTERATION = false
+
+[webhook]
+TASK_INTERVAL = 1
+DELIVER_TIMEOUT = 5
+
+[mailer]
+ENABLED = true
+SEND_BUFFER_LEN = 10
+SUBJECT = %(APP_NAME)s
+HOST = {{ salt['pillar.get']('mail:server', 'localhost') }}:{{ salt['pillar.get']('mail:port', '25') }}
+FROM = 
+USER = {{ salt['pillar.get']('mail:account', '') }}
+PASSWD = {{ salt['pillar.get']('mail:password', '') }}
+
+[oauth]
+ENABLED = false
+
+[oauth.github]
+ENABLED = false
+CLIENT_ID = 
+CLIENT_SECRET = 
+SCOPES = https://api.github.com/user
+AUTH_URL = https://github.com/login/oauth/authorize
+TOKEN_URL = https://github.com/login/oauth/access_token
+
+; Get client id and secret from
+; https://console.developers.google.com/project
+[oauth.google]
+ENABLED = false
+CLIENT_ID = 
+CLIENT_SECRET = 
+SCOPES = https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
+AUTH_URL = https://accounts.google.com/o/oauth2/auth
+TOKEN_URL = https://accounts.google.com/o/oauth2/token
+
+[oauth.qq]
+ENABLED = false
+CLIENT_ID = 
+CLIENT_SECRET = 
+SCOPES = get_user_info
+AUTH_URL = https://graph.qq.com/oauth2.0/authorize
+TOKEN_URL = https://graph.qq.com/oauth2.0/token
+
+[oauth.weibo]
+ENABLED = false
+CLIENT_ID = 
+CLIENT_SECRET = 
+SCOPES = all
+AUTH_URL = https://api.weibo.com/oauth2/authorize
+TOKEN_URL = https://api.weibo.com/oauth2/access_token
+
+[cache]
+ADAPTER = memory
+INTERVAL = 60
+HOST = 
+
+[session]
+PROVIDER = file
+PROVIDER_CONFIG = data/sessions
+COOKIE_NAME = i_like_gogits
+COOKIE_SECURE = false
+ENABLE_SET_COOKIE = true
+GC_INTERVAL_TIME = 86400
+SESSION_LIFE_TIME = 86400
+
+[picture]
+SERVICE = server
+AVATAR_UPLOAD_PATH = data/avatars
+GRAVATAR_SOURCE = gravatar
+DISABLE_GRAVATAR = true
+
+[attachment]
+ENABLE = true
+PATH = data/attachments
+ALLOWED_TYPES = image/jpeg|image/png
+MAX_SIZE = 32
+MAX_FILES = 10
+
+[time]
+; Specifies the format for fully outputed dates. Defaults to RFC1123
+; Special supported values are ANSIC, UnixDate, RubyDate, RFC822, RFC822Z, RFC850, RFC1123, RFC1123Z, RFC3339, RFC3339Nano, Kitchen, Stamp, StampMilli, StampMicro and StampNano
+; For more information about the format see http://golang.org/pkg/time/#pkg-constants
+FORMAT = 
+
+[log]
+ROOT_PATH = log
+MODE = file
+BUFFER_LEN = 10000
+LEVEL = Info
+
+; For "console" mode only
+[log.console]
+LEVEL = 
+
+; For "file" mode only
+[log.file]
+LEVEL = 
+LOG_ROTATE = true
+MAX_LINES = 1000000
+MAX_SIZE_SHIFT = 28
+DAILY_ROTATE = true
+MAX_DAYS = 7
+
+; For "conn" mode only
+[log.conn]
+LEVEL = 
+RECONNECT_ON_MSG = false
+RECONNECT = false
+PROTOCOL = tcp
+ADDR = 
+
+; For "smtp" mode only
+[log.smtp]
+LEVEL = 
+SUBJECT = Diagnostic message from serve
+HOST = 
+USER = 
+PASSWD = 
+RECEIVERS = 
+
+; For "database" mode only
+[log.database]
+LEVEL = 
+DRIVER = 
+CONN = 
+
+[git]
+MAX_GITDIFF_LINES = 10000
+FSCK_ARGS = 
+GC_ARGS = 
+
+[i18n]
+LANGS = en-US
+NAMES = English

@@ -7,7 +7,7 @@ LoadPlugin ping
 <Plugin ping>
 {%- for host in salt['pillar.get']('net:hosts', {}) %}
     Host "{{ host }}.vpn"
-{% endfor -%}
+{%- endfor %}
     Interval 1.0
     Timeout 0.9
     TTL 255

@@ -1,0 +1,43 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+server {
+    listen   80;
+
+    server_name {{ nginx_server_name }};
+
+    rewrite ^ https://$host$uri permanent;
+}
+
+server {
+    listen   443 ssl;
+
+    server_name {{ nginx_server_name }};
+
+    ssl_certificate            {{ ssl_cert }};
+    ssl_certificate_key        {{ ssl_key }};
+
+    include /etc/nginx/ssl.conf;
+
+    ssl_verify_client   optional;
+    ssl_verify_depth    1;
+
+    charset utf8;
+    limit_conn perip 10;
+    limit_conn perserver 150;
+
+    client_max_body_size 500m;
+    client_body_buffer_size 128k;
+
+    access_log /var/log/nginx/access.{{ nginx_conf_name }}.log;
+    error_log  /var/log/nginx/error.{{ nginx_conf_name }}.log;
+
+    location / {
+        proxy_pass http://localhost:3000;
+
+        proxy_connect_timeout  36000s;
+        proxy_read_timeout  36000s;
+    }
+}

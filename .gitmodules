@@ -4,3 +4,6 @@
 [submodule "acestream/aceproxy"]
 	path = acestream/aceproxy
 	url = https://github.com/ValdikSS/aceproxy
+[submodule "ldap-admin/src"]
+	path = ldap-admin/src
+	url = https://github.com/rabits/rldapadmin.git

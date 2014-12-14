@@ -14,10 +14,10 @@ openvpn:
   pkg:
     - installed
   service:
-    {%- if vpn.instance != 'none' %}
+    {%- if vpn.autorun != 'no' %}
     - running
     {%- else %}
-    - dead
+    - disabled
     {%- endif %}
 
 {% if vpn.instance != 'none' -%}
@@ -39,8 +39,8 @@ openvpn:
       vpn_net: {{ vpn.net }}
       vpn_mask: {{ vpn.mask }}
       ssl_ca_crt: {{ ssl.ca_crt }}
-      ssl_certs: {{ ssl.certs }}
-      ssl_keys: {{ ssl.keys }}
+      ssl_cert: {{ ssl.cert }}
+      ssl_key: {{ ssl.key }}
       ssl_dh: {{ ssl.dh }}
     - require:
       - pkg: openvpn

@@ -29,6 +29,8 @@ vsftpd:
 
 ftp:
   user.present:
+    - system: True
+    - createhome: False
     - require:
       - pkg: vsftpd
     - groups:

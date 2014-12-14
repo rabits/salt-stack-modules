@@ -4,8 +4,8 @@
 #
 
 interface: 0.0.0.0
-publish_port: 4505
-ret_port: 4506
+publish_port: {{ salt['config.option']('publish_port') }}
+ret_port: {{ salt['config.option']('ret_port') }}
 
 user: salt-stack
 max_open_files: 100000
@@ -22,6 +22,8 @@ minion_data_cache: True
 
 open_mode: False
 auto_accept: False
+
+yaml_utf8: True
 
 client_acl:
   www-data:

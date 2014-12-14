@@ -11,8 +11,8 @@ remote {{ vpn_host }}
 port {{ vpn_port }}
 
 ca {{ ssl_ca_crt }}
-cert {{ ssl_certs }}/{{ grains['id'] }}.crt
-key {{ ssl_keys }}/{{ grains['id'] }}.key
+cert {{ ssl_cert }}
+key {{ ssl_key }}
 
 tls-client
 tls-auth {{ vpn_ta }} 1

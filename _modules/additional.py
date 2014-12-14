@@ -64,3 +64,15 @@ def substring_search(what, where):
         salt '*' additional.substring_search 'Radeon' [{'model':'asd Radeon asdds'}]
     '''
     return any(what in s['model'] for s in where) or any(what in s['vendor'] for s in where)
+
+def inverse(value, separator = '.'):
+    '''
+    Will reverse seaprated value like 'sub.example.net' => 'net.example.sub'
+
+    CLI Example::
+
+        salt '*' additional.inverse 'sub.example.net' 
+    '''
+    out = value.split(separator)
+    out.reverse()
+    return separator.join(out)

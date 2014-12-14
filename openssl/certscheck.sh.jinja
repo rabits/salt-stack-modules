@@ -29,14 +29,19 @@ msg() {
     msg="${msg}\n${1}"
 }
 
+err() {
+    echo "${1}"
+    msg="${msg}\n<b>${1}</b>"
+    ERROR=1
+}
+
 for cert in {{ ssl_certs }}/*
 do
-    msg "${cert}: Checking cert"
+    msg "${cert}:"
     output=$(openssl x509 -noout -in "${cert}" -dates 2>/dev/null) 
 
     if [ "$?" -ne 0 ]; then
-        msg "${cert}:   Error getting info for cert"
-        ERROR=1
+        err "  ! Error getting info for cert"
         continue
     fi
 
@@ -49,26 +54,33 @@ do
     epoch_now=$(date +%s)
 
     if [ "$start_epoch" -gt "$epoch_now" ]; then
-        msg "${cert}:   - is not yet valid"
-        ERROR=1
+        err "  ! is not yet valid"
     fi
 
     seconds_to_expire=$(($end_epoch - $epoch_now))
     days_to_expire=$(($seconds_to_expire / 86400))
 
-    msg "${cert}:   * days to expire: $days_to_expire"
-
     warning_seconds=$((86400 * $warning_days))
 
     if [ "$seconds_to_expire" -lt "$warning_seconds" ]; then
-        msg "${cert}:   - is soon to expire ($seconds_to_expire seconds)"
-        ERROR=1
+        err "  ! is soon to expire: $days_to_expire days"
+    else
+        msg "  * days to expire: $days_to_expire days"
     fi
 done
 
 if [ ${ERROR} -gt 0 ]
 then
-    echo "${msg}" | mail -s "${subj}" ${recipients}
+#    echo "${msg}" | mail -s "${subj}" ${recipients}
+    cat <<EOF - | /usr/sbin/sendmail -t
+To: ${recipients}
+Subject: ${subj}
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+$(echo "${msg}" | sed ':a;N;$!ba;s/\n/<br\/>\n/g')
+</body></html>
+EOF
     if [ "$?" -ne 0 ]; then
         echo "Error: mail was not sent"
     else
