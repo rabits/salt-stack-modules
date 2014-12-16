@@ -14,7 +14,8 @@ include:
 {% set nginx_cert = salt['pillar.get']('gogs:ssl_cert', ssl.cert) %}
 
 {% set home_dir = salt['pillar.get']('gogs:home_dir', '/srv/git') %}
-{% set dist = salt['pillar.get']('gogs:dist', 'http://gogs.dn.qbox.me/gogs_v0.5.8_linux_amd64.zip') %}
+{% set dist_def = 'http://gogs.dn.qbox.me/gogs_v0.5.8_linux_amd64.zip' %}
+{% set dist = salt['pillar.get']('gogs:dist', dist_def) %}
 {% set dist_dir = salt['pillar.get']('gogs:dist_dir', '/srv/gogs') %}
 {% set username = salt['pillar.get']('gogs:username', 'git') %}
 
@@ -45,12 +46,20 @@ include:
     - require:
       - user: {{ username }}
 
+{{ dist_dir }}:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: 755
+
 gogs-unpack:
   archive.extracted:
-    - name: /srv
+    - name: {{ dist_dir }}
     - archive_user: root
     - archive_format: tar
-    - source: {{ dist }}
+    - source:
+      - '{{ dist }}'
+      - '{{ dist_def }}'
     - if_missing: {{ dist_dir }}
     - keep: True
     - require:
@@ -60,17 +69,18 @@ gogs-subdirs:
   file.directory:
     - names:
       - {{ dist_dir }}/data
-      - {{ dist_dir }}/custom
+      - {{ dist_dir }}/gogs/custom
       - {{ dist_dir }}/log
     - user: {{ username }}
     - group: {{ username }}
     - mode: 750
     - require:
+      - file: {{ dist_dir }}
       - archive: gogs-unpack
     - require_in:
       - service: gogs
 
-{{ dist_dir }}/custom/conf/app.ini:
+{{ dist_dir }}/gogs/custom/conf/app.ini:
   file.managed:
     - source: salt://gogs/app.ini.jinja
     - template: jinja
@@ -135,5 +145,5 @@ gogs:
     - require:
       - user: {{ username }}
     - watch:
-      - file: {{ dist_dir }}/custom/conf/app.ini
+      - file: {{ dist_dir }}/gogs/custom/conf/app.ini
       - archive: gogs-unpack

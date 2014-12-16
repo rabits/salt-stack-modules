@@ -18,6 +18,6 @@ setgid {{ username }}
 env HOME="{{ home_dir }}"
 env USER="{{ username }}"
 
-chdir {{ dist_dir }}
+chdir {{ dist_dir }}/gogs
 
-exec {{ dist_dir }}/gogs web
+exec {{ dist_dir }}/gogs/gogs web

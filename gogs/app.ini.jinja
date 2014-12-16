@@ -114,7 +114,7 @@ HOST =
 
 [session]
 PROVIDER = file
-PROVIDER_CONFIG = data/sessions
+PROVIDER_CONFIG = {{ dist_dir }}/data/sessions
 COOKIE_NAME = i_like_gogits
 COOKIE_SECURE = false
 ENABLE_SET_COOKIE = true
@@ -123,13 +123,13 @@ SESSION_LIFE_TIME = 86400
 
 [picture]
 SERVICE = server
-AVATAR_UPLOAD_PATH = data/avatars
+AVATAR_UPLOAD_PATH = {{ dist_dir }}/data/avatars
 GRAVATAR_SOURCE = gravatar
 DISABLE_GRAVATAR = true
 
 [attachment]
 ENABLE = true
-PATH = data/attachments
+PATH = {{ dist_dir }}/data/attachments
 ALLOWED_TYPES = image/jpeg|image/png
 MAX_SIZE = 32
 MAX_FILES = 10
@@ -141,7 +141,7 @@ MAX_FILES = 10
 FORMAT = 
 
 [log]
-ROOT_PATH = log
+ROOT_PATH = {{ dist_dir }}/log
 MODE = file
 BUFFER_LEN = 10000
 LEVEL = Info
