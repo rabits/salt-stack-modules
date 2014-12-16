@@ -455,14 +455,30 @@ jarmon.RrdQuery.prototype.getData = function(startTimeJs, endTimeJs,
         timestamp += step;
     }
 
+    var noline = false;
+    // Prepend startpoint
+    if( flotData.length == 0 ) {
+        flotData.unshift([startTimeJs, 0]);
+        noline = true;
+    } else if( flotData[0][0] > startTimeJs )
+        flotData.unshift([startTimeJs, flotData[0][1]]);
+
+    // Add endpoint
+    flotData.push([flotData[flotData.length-1][0], 0]);
+    flotData.push([endTimeJs, 0]);
+
     // Now get the date of the earliest record in entire rrd file, ie that of
     // the last (longest range) rra.
     rra = this.rrd.getRRA(this.rrd.getNrRRAs()-1);
     var firstUpdated = lastUpdated - (rra.getNrRows() -1) * rra.getStep();
 
-    return {'label': ds.getName(), 'data': flotData, 'unit': this.unit,
-            'firstUpdated': firstUpdated*1000.0,
-            'lastUpdated': lastUpdated*1000.0};
+    var out = {'label': ds.getName(), 'data': flotData, 'unit': this.unit,
+               'firstUpdated': firstUpdated*1000.0,
+               'lastUpdated': lastUpdated*1000.0};
+    if( noline )
+        out['lines'] = { lineWidth: 0 };
+
+    return out;
 };
 
 
