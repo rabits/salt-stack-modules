@@ -15,7 +15,8 @@ include:
 {% set nginx_cert = salt['pillar.get']('seafile:ssl_cert', ssl.cert) %}
 
 {% set home_dir = salt['pillar.get']('seafile:home_dir', '/srv/seafile') %}
-{% set dist = salt['pillar.get']('seafile:dist', 'https://bitbucket.org/haiwen/seafile/downloads/seafile-server_4.0.1_x86-64.tar.gz') %}
+{% set dist_def = 'https://bitbucket.org/haiwen/seafile/downloads/seafile-server_4.0.1_x86-64.tar.gz' %}
+{% set dist = salt['pillar.get']('seafile:dist', dist_def) %}
 {% set username = salt['pillar.get']('seafile:username', 'seafile') %}
 
 {% set db_type = salt['pillar.get']('seafile:db_type', 'sqlite3') %}
@@ -41,7 +42,9 @@ seafile-packages:
       - python-psycopg2
   file.managed:
     - name: {{ home_dir }}/{{ dist.split('/')[-1] }}
-    - source: {{ dist }}
+    - source:
+      - '{{ dist }}'
+      - '{{ dist_def }}'
     - replace: False
     - makedirs: True
     - user: root
