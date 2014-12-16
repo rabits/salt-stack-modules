@@ -51,15 +51,19 @@ openvpn:
 /etc/default/openvpn:
   file.replace:
     - pattern: '^AUTOSTART=.+$'
+    {%- if vpn.autorun == 'no' %}
+    - repl: AUTOSTART=""
+    {%- else %}
     - repl: AUTOSTART="{{ vpn.instance }}"
+    {%- endif %}
     - append_if_not_found: True
     - watch_in:
       - service: openvpn
     - require:
       - pkg: openvpn
-    {%- if vpn.instance != 'none' %}
+      {%- if vpn.instance != 'none' %}
       - file: /etc/openvpn/{{ vpn.instance }}.conf
-    {%- endif %}
+      {%- endif %}
 
 {{ vpn.ta }}:
   file.managed:
