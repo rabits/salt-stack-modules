@@ -1,21 +1,21 @@
 -- XEP-0313: Message Archive Management for Prosody
--- Copyright (C) 2011-2012 Kim Alvefur
+-- Copyright (C) 2011-2014 Kim Alvefur
 --
 -- This file is MIT/X11 licensed.
 
-local xmlns_mam     = "urn:xmpp:mam:tmp";
+local xmlns_mam     = "urn:xmpp:mam:0";
 local xmlns_delay   = "urn:xmpp:delay";
 local xmlns_forward = "urn:xmpp:forward:0";
 
 local st = require "util.stanza";
 local rsm = module:require "rsm";
-local prefs = module:require"mamprefs";
-local prefsxml = module:require"mamprefsxml";
-local set_prefs, get_prefs = prefs.set, prefs.get;
-local prefs_to_stanza, prefs_from_stanza = prefsxml.tostanza, prefsxml.fromstanza;
+local get_prefs = module:require"mamprefs".get;
+local set_prefs = module:require"mamprefs".set;
+local prefs_to_stanza = module:require"mamprefsxml".tostanza;
+local prefs_from_stanza = module:require"mamprefsxml".fromstanza;
 local jid_bare = require "util.jid".bare;
 local jid_split = require "util.jid".split;
-local jid_prep = require "util.jid".prep;
+local dataform = require "util.dataforms".new;
 local host = module.host;
 
 local rm_load_roster = require "core.rostermanager".load_roster;
@@ -31,6 +31,9 @@ local m_min = math.min;
 local timestamp, timestamp_parse = require "util.datetime".datetime, require "util.datetime".parse;
 local default_max_items, max_max_items = 20, module:get_option_number("max_archive_query_results", 50);
 local global_default_policy = module:get_option("default_archive_policy", false);
+if global_default_policy ~= "roster" then
+	global_default_policy = module:get_option_boolean("default_archive_policy", global_default_policy);
+end
 
 local archive_store = "archive2";
 local archive = module:open_store(archive_store, "archive");
@@ -61,18 +64,37 @@ module:hook("iq/self/"..xmlns_mam..":prefs", function(event)
 	end
 end);
 
--- Handle archive queries
+local query_form = dataform {
+	{ name = "FORM_TYPE"; type = "hidden"; value = xmlns_mam; };
+	{ name = "with"; type = "jid-single"; };
+	{ name = "start"; type = "text-single" };
+	{ name = "end"; type = "text-single"; };
+};
+
+-- Serve form
 module:hook("iq-get/self/"..xmlns_mam..":query", function(event)
+	local origin, stanza = event.origin, event.stanza;
+	return origin.send(st.reply(stanza):add_child(query_form:form()));
+end);
+
+-- Handle archive queries
+module:hook("iq-set/self/"..xmlns_mam..":query", function(event)
 	local origin, stanza = event.origin, event.stanza;
 	local query = stanza.tags[1];
 	local qid = query.attr.queryid;
 
 	-- Search query parameters
-	local qwith = query:get_child_text("with");
-	local qstart = query:get_child_text("start");
-	local qend = query:get_child_text("end");
-	module:log("debug", "Archive query, id %s with %s from %s until %s)",
-		tostring(qid), qwith or "anyone", qstart or "the dawn of time", qend or "now");
+	local qwith, qstart, qend;
+	local form = query:get_child("x", "jabber:x:data");
+	if form then
+		local err;
+		form, err = query_form:data(form);
+		if err then
+			return origin.send(st.error_reply(stanza, "modify", "bad-request", select(2, next(err))))
+		end
+		qwith, qstart, qend = form["with"], form["start"], form["end"];
+		qwith = qwith and jid_bare(qwith); -- dataforms does jidprep
+	end
 
 	if qstart or qend then -- Validate timestamps
 		local vstart, vend = (qstart and timestamp_parse(qstart)), (qend and timestamp_parse(qend))
@@ -83,14 +105,8 @@ module:hook("iq-get/self/"..xmlns_mam..":query", function(event)
 		qstart, qend = vstart, vend;
 	end
 
-	if qwith then -- Validate the 'with' jid
-		local pwith = qwith and jid_prep(qwith);
-		if pwith and not qwith then -- it failed prepping
-			origin.send(st.error_reply(stanza, "modify", "bad-request", "Invalid JID"))
-			return true
-		end
-		qwith = jid_bare(pwith);
-	end
+	module:log("debug", "Archive query, id %s with %s from %s until %s)",
+		tostring(qid), qwith or "anyone", qstart or "the dawn of time", qend or "now");
 
 	-- RSM stuff
 	local qset = rsm.get(query);
@@ -115,10 +131,13 @@ module:hook("iq-get/self/"..xmlns_mam..":query", function(event)
 	end
 	local count = err;
 
+	origin.send(st.reply(stanza))
+	local msg_reply_attr = { to = stanza.attr.from, from = stanza.attr.to };
+
 	-- Wrap it in stuff and deliver
-	local first, last;
+	local fwd_st, first, last;
 	for id, item, when in data do
-		local fwd_st = st.message{ to = origin.full_jid }
+		fwd_st = st.message(msg_reply_attr)
 			:tag("result", { xmlns = xmlns_mam, queryid = qid, id = id })
 				:tag("forwarded", { xmlns = xmlns_forward })
 					:tag("delay", { xmlns = xmlns_delay, stamp = timestamp(when) }):up();
@@ -138,9 +157,10 @@ module:hook("iq-get/self/"..xmlns_mam..":query", function(event)
 	module:log("debug", "Archive query %s completed", tostring(qid));
 
 	if reverse then first, last = last, first; end
-	return origin.send(st.reply(stanza)
-		:query(xmlns_mam):add_child(rsm.generate {
-			first = first, last = last, count = count }));
+	return origin.send(st.message(msg_reply_attr)
+		:tag("fin", { xmlns = xmlns_mam, queryid = qid })
+			:add_child(rsm.generate {
+				first = first, last = last, count = count }));
 end);
 
 local function has_in_roster(user, who)
@@ -201,10 +221,7 @@ local function message_handler(event, c2s)
 		module:log("debug", "Archiving stanza: %s", stanza:top_tag());
 
 		-- And stash it
-		local ok, id = archive:append(store_user, time_now(), with, stanza);
-		if ok then
-			stanza:tag("archived", { xmlns = xmlns_mam, by = store_user.."@"..host, id = id }):up();
-		end
+		local ok, id = archive:append(store_user, nil, time_now(), with, stanza);
 	else
 		module:log("debug", "Not archiving stanza: %s (prefs)", stanza:top_tag());
 	end
@@ -220,17 +237,6 @@ module:hook("pre-message/full", c2s_message_handler, 2);
 -- Stanszas to local clients
 module:hook("message/bare", message_handler, 2);
 module:hook("message/full", message_handler, 2);
-
-local function post_carbons_handler(event)
-	event.stanza:maptags(function(tag)
-		if not ( tag.attr.xmlns == xmlns_mam and tag.name == "archived" ) then
-			return tag;
-		end
-	end);
-end
-
-module:hook("pre-message/bare", post_carbons_handler, 0.9);
-module:hook("pre-message/full", post_carbons_handler, 0.9);
 
 module:add_feature(xmlns_mam);
 

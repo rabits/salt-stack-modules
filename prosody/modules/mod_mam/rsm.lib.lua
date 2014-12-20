@@ -5,9 +5,10 @@ local pairs = pairs;
 
 local xmlns_rsm = 'http://jabber.org/protocol/rsm';
 
-local element_parsers;
+local element_parsers = {};
 
 do
+	local parsers = element_parsers;
 	local function xs_int(st)
 		return tonumber((st:get_text()));
 	end
@@ -15,21 +16,19 @@ do
 		return st:get_text();
 	end
 
-	element_parsers = {
-		after = xs_string;
-		before = function(st)
+	parsers.after = xs_string;
+	parsers.before = function(st)
 			local text = st:get_text();
 			return text == "" or text;
 		end;
-		max = xs_int;
-		index = xs_int;
+	parsers.max = xs_int;
+	parsers.index = xs_int;
 
-		first = function(st)
+	parsers.first = function(st)
 			return { index = tonumber(st.attr.index); st:get_text() };
 		end;
-		last = xs_string;
-		count = xs_int;
-	}
+	parsers.last = xs_string;
+	parsers.count = xs_int;
 end
 
 local element_generators = setmetatable({
@@ -56,9 +55,9 @@ local element_generators = setmetatable({
 });
 
 
-local function parse(stanza)
+local function parse(set)
 	local rs = {};
-	for tag in stanza:childtags() do
+	for tag in set:childtags() do
 		local name = tag.name;
 		local parser = name and element_parsers[name];
 		if parser then

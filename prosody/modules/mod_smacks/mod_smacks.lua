@@ -57,59 +57,46 @@ module:hook("s2s-stream-features",
 			end
 		end);
 
-module:hook_stanza("http://etherx.jabber.org/streams", "features",
-		function (session, stanza)
-			if can_do_smacks(session) then
-				if stanza:get_child("sm", xmlns_sm3) then
-					session.sends2s(st.stanza("enable", sm3_attr));
-				elseif stanza:get_child("sm", xmlns_sm2) then
-					session.sends2s(st.stanza("enable", sm2_attr));
-				end
-			end
-		end);
+local function outgoing_stanza_filter(stanza, session)
+	local is_stanza = stanza.attr and not stanza.attr.xmlns;
+	if is_stanza and not stanza._cached then -- Stanza in default stream namespace
+		local queue = session.outgoing_stanza_queue;
+		local cached_stanza = st.clone(stanza);
+		cached_stanza._cached = true;
 
-local function wrap_session(session, resume, xmlns_sm)
-	local sm_attr = { xmlns = xmlns_sm };
-	-- Overwrite process_stanza() and send()
-	local queue;
-	if not resume then
-		queue = {};
-		session.outgoing_stanza_queue = queue;
-		session.last_acknowledged_stanza = 0;
-	else
-		queue = session.outgoing_stanza_queue;
-	end
-
-	local _send = session.sends2s or session.send;
-	local function new_send(stanza)
-		local attr = stanza.attr;
-		if attr and not attr.xmlns then -- Stanza in default stream namespace
-			local cached_stanza = st.clone(stanza);
-
-			if cached_stanza and cached_stanza:get_child("delay", xmlns_delay) == nil then
-				cached_stanza = cached_stanza:tag("delay", { xmlns = xmlns_delay, from = session.host, stamp = datetime.datetime()});
-			end
-
-			queue[#queue+1] = cached_stanza;
+		if cached_stanza and cached_stanza:get_child("delay", xmlns_delay) == nil then
+			cached_stanza = cached_stanza:tag("delay", { xmlns = xmlns_delay, from = session.host, stamp = datetime.datetime()});
 		end
+
+		queue[#queue+1] = cached_stanza;
+		session.log("debug", "#queue = %d", #queue);
 		if session.hibernating then
-			-- The session is hibernating, no point in sending the stanza
-			-- over a dead connection.  It will be delivered upon resumption.
-			return true;
+			session.log("debug", "hibernating, stanza queued");
+			return ""; -- Hack to make session.send() not return nil
 		end
-		local ok, err = _send(stanza);
-		if ok and #queue > max_unacked_stanzas and not session.awaiting_ack and attr and not attr.xmlns then
+		if #queue > max_unacked_stanzas and not session.awaiting_ack then
 			session.awaiting_ack = true;
-			return _send(st.stanza("r", sm_attr));
+			return tostring(stanza)..tostring(st.stanza("r", { xmlns = session.smacks }));
 		end
-		return ok, err;
+	end
+	return stanza;
+end
+
+local function count_incoming_stanzas(stanza, session)
+	if not stanza.attr.xmlns then
+		session.handled_stanza_count = session.handled_stanza_count + 1;
+		session.log("debug", "Handled %d incoming stanzas", session.handled_stanza_count);
+	end
+	return stanza;
+end
+
+local function wrap_session_out(session, resume)
+	if not resume then
+		session.outgoing_stanza_queue = {};
+		session.last_acknowledged_stanza = 0;
 	end
 
-	if session.sends2s then
-		session.sends2s = new_send;
-	else
-		session.send = new_send;
-	end
+	add_filter(session, "stanzas/out", outgoing_stanza_filter, -1000);
 
 	local session_close = session.close;
 	function session.close(...)
@@ -119,18 +106,21 @@ local function wrap_session(session, resume, xmlns_sm)
 		end
 		return session_close(...);
 	end
+	return session;
+end
 
+local function wrap_session_in(session, resume)
 	if not resume then
 		session.handled_stanza_count = 0;
-		add_filter(session, "stanzas/in", function (stanza)
-			if not stanza.attr.xmlns then
-				session.handled_stanza_count = session.handled_stanza_count + 1;
-				session.log("debug", "Handled %d incoming stanzas", session.handled_stanza_count);
-			end
-			return stanza;
-		end);
+		add_filter(session, "stanzas/in", count_incoming_stanzas, 1000);
 	end
 
+	return session;
+end
+
+local function wrap_session(session, resume)
+	wrap_session_out(session, resume);
+	wrap_session_in(session, resume);
 	return session;
 end
 
@@ -138,14 +128,14 @@ function handle_enable(session, stanza, xmlns_sm)
 	local ok, err, err_text = can_do_smacks(session);
 	if not ok then
 		session.log("warn", "Failed to enable smacks: %s", err_text); -- TODO: XEP doesn't say we can send error text, should it?
-		session.send(st.stanza("failed", { xmlns = xmlns_sm }):tag(err, { xmlns = xmlns_errors}));
+		(session.sends2s or session.send)(st.stanza("failed", { xmlns = xmlns_sm }):tag(err, { xmlns = xmlns_errors}));
 		return true;
 	end
 
 	module:log("debug", "Enabling stream management");
-	session.smacks = true;
+	session.smacks = xmlns_sm;
 
-	wrap_session(session, false, xmlns_sm);
+	wrap_session(session, false);
 
 	local resume_token;
 	local resume = stanza.attr.resume;
@@ -160,11 +150,29 @@ end
 module:hook_stanza(xmlns_sm2, "enable", function (session, stanza) return handle_enable(session, stanza, xmlns_sm2); end, 100);
 module:hook_stanza(xmlns_sm3, "enable", function (session, stanza) return handle_enable(session, stanza, xmlns_sm3); end, 100);
 
+module:hook_stanza("http://etherx.jabber.org/streams", "features",
+		function (session, stanza)
+			module:add_timer(0, function ()
+				if can_do_smacks(session) then
+					if stanza:get_child("sm", xmlns_sm3) then
+						session.sends2s(st.stanza("enable", sm3_attr));
+						session.smacks = xmlns_sm3;
+					elseif stanza:get_child("sm", xmlns_sm2) then
+						session.sends2s(st.stanza("enable", sm2_attr));
+						session.smacks = xmlns_sm2;
+					else
+						return;
+					end
+					wrap_session_out(session, false);
+				end
+			end);
+		end);
+
 function handle_enabled(session, stanza, xmlns_sm)
 	module:log("debug", "Enabling stream management");
-	session.smacks = true;
+	session.smacks = xmlns_sm;
 
-	wrap_session(session, false, xmlns_sm);
+	wrap_session_in(session, false);
 
 	-- FIXME Resume?
 
@@ -191,19 +199,24 @@ function handle_a(origin, stanza)
 	origin.awaiting_ack = nil;
 	-- Remove handled stanzas from outgoing_stanza_queue
 	--log("debug", "ACK: h=%s, last=%s", stanza.attr.h or "", origin.last_acknowledged_stanza or "");
-	local handled_stanza_count = tonumber(stanza.attr.h)-origin.last_acknowledged_stanza;
+	local h = tonumber(stanza.attr.h);
+	if not h then
+		origin:close{ condition = "invalid-xml"; text = "Missing or invalid 'h' attribute"; };
+	end
+	local handled_stanza_count = h-origin.last_acknowledged_stanza;
 	local queue = origin.outgoing_stanza_queue;
 	if handled_stanza_count > #queue then
-		module:log("warn", "The client says it handled %d new stanzas, but we only sent %d :)",
+		origin.log("warn", "The client says it handled %d new stanzas, but we only sent %d :)",
 			handled_stanza_count, #queue);
-		module:log("debug", "Client h: %d, our h: %d", tonumber(stanza.attr.h), origin.last_acknowledged_stanza);
+		origin.log("debug", "Client h: %d, our h: %d", tonumber(stanza.attr.h), origin.last_acknowledged_stanza);
 		for i=1,#queue do
-			module:log("debug", "Q item %d: %s", i, tostring(queue[i]));
+			origin.log("debug", "Q item %d: %s", i, tostring(queue[i]));
 		end
 	end
 	for i=1,math_min(handled_stanza_count,#queue) do
 		t_remove(origin.outgoing_stanza_queue, 1);
 	end
+	origin.log("debug", "#queue = %d", #queue);
 	origin.last_acknowledged_stanza = origin.last_acknowledged_stanza + handled_stanza_count;
 	return true;
 end
@@ -238,7 +251,7 @@ module:hook("pre-resource-unbind", function (event)
 		if not session.resumption_token then
 			local queue = session.outgoing_stanza_queue;
 			if #queue > 0 then
-				module:log("warn", "Destroying session with %d unacked stanzas", #queue);
+				session.log("warn", "Destroying session with %d unacked stanzas", #queue);
 				handle_unacked_stanzas(session);
 			end
 		else
@@ -302,24 +315,13 @@ function handle_resume(session, stanza, xmlns_sm)
 		original_session.ip = session.ip;
 		original_session.conn = session.conn;
 		original_session.send = session.send;
+		original_session.send.filter = original_session.filter;
 		original_session.stream = session.stream;
 		original_session.secure = session.secure;
 		original_session.hibernating = nil;
-		local filter = original_session.filter;
-		local stream = session.stream;
-		local log = session.log;
-		function original_session.data(data)
-			data = filter("bytes/in", data);
-			if data then
-				local ok, err = stream:feed(data);
-				if ok then return; end
-				log("debug", "Received invalid XML (%s) %d bytes: %s", tostring(err), #data, data:sub(1, 300):gsub("[\r\n]+", " "):gsub("[%z\1-\31]", "_"));
-				original_session:close("xml-not-well-formed");
-			end
-		end
-		wrap_session(original_session, true, xmlns_sm);
+		wrap_session(original_session, true);
 		-- Inform xmppstream of the new session (passed to its callbacks)
-		stream:set_session(original_session);
+		original_session.stream:set_session(original_session);
 		-- Similar for connlisteners
 		c2s_sessions[session.conn] = original_session;
 
@@ -333,9 +335,11 @@ function handle_resume(session, stanza, xmlns_sm)
 		-- Ok, we need to re-send any stanzas that the client didn't see
 		-- ...they are what is now left in the outgoing stanza queue
 		local queue = original_session.outgoing_stanza_queue;
+		session.log("debug", "#queue = %d", #queue);
 		for i=1,#queue do
 			session.send(queue[i]);
 		end
+		session.log("debug", "#queue = %d -- after send", #queue);
 	else
 		module:log("warn", "Client %s@%s[%s] tried to resume stream for %s@%s[%s]",
 			session.username or "?", session.host or "?", session.type,
