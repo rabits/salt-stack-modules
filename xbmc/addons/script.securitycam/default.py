@@ -1,6 +1,6 @@
 # Import the modules
 import os, time, urllib2, xbmc, xbmcaddon, xbmcgui, xbmcvfs
-
+import sys
 # Constants
 ACTION_PREVIOUS_MENU = 10
 ACTION_BACKSPACE = 110
