@@ -15,7 +15,7 @@ include:
 {% set nginx_cert = salt['pillar.get']('seafile:ssl_cert', ssl.cert) %}
 
 {% set home_dir = salt['pillar.get']('seafile:home_dir', '/srv/seafile') %}
-{% set dist_def = 'https://bitbucket.org/haiwen/seafile/downloads/seafile-server_4.0.1_x86-64.tar.gz' %}
+{% set dist_def = 'https://bitbucket.org/haiwen/seafile/downloads/seafile-server_4.0.6_x86-64.tar.gz' %}
 {% set dist = salt['pillar.get']('seafile:dist', dist_def) %}
 {% set username = salt['pillar.get']('seafile:username', 'seafile') %}
 
@@ -30,6 +30,7 @@ include:
 {% set ldap_url = salt['pillar.get']('seafile:ldap_url', '') %}
 {% set ldap_userbase = salt['pillar.get']('seafile:ldap_userbase', 'ou=Users,dc=example,dc=net') %}
 {% set ldap_attr = salt['pillar.get']('seafile:ldap_attr', 'cn') %}
+{% set ldap_filter = salt['pillar.get']('seafile:ldap_filter', '') %}
 
 {% set secret_key = salt['pillar.get']('seafile:secret_key', salt['random.str_encode'](salt['grains.get_or_set_hash']('gogs:instance', 32), 'base64')) %}
 
@@ -153,6 +154,7 @@ seafile-packages:
       ldap_url: {{ ldap_url }}
       ldap_userbase: {{ ldap_userbase }}
       ldap_attr: {{ ldap_attr }}
+      ldap_filter: {{ ldap_filter }}
     - watch_in:
       - service: seafile
     - require:
@@ -181,7 +183,7 @@ seafile-packages:
       - user: {{ username }}
       - file: {{ home_dir }}/conf
 
-{{ home_dir }}/data/seafile-data:
+{{ home_dir }}/data:
   file.directory:
     - user: {{ username }}
     - group: {{ username }}
@@ -191,9 +193,9 @@ seafile-packages:
       - user: {{ username }}
       - file: {{ home_dir }}
 
-{{ home_dir }}/data/seafile-data/seafile.conf:
+{{ home_dir }}/data/seafile.conf:
   file.managed:
-    - source: salt://seafile/seafile-data_seafile.conf.jinja
+    - source: salt://seafile/seafile.conf.jinja
     - template: jinja
     - user: {{ username }}
     - group: {{ username }}
@@ -209,7 +211,7 @@ seafile-packages:
       - service: seafile
     - require:
       - user: {{ username }}
-      - file: {{ home_dir }}/data/seafile-data
+      - file: {{ home_dir }}/data
 
 /etc/nginx/sites-available/{{ nginx_conf_name }}.conf:
   file.managed:

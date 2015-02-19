@@ -1,0 +1,35 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+description "S3QL S3 filesystem upstart script"
+author      "Rabit <home@rabits.org>"
+
+start on (local-filesystems and net-device-up IFACE!=lo{% if required_for != None %} and starting {{ required_for }}{% endif %})
+stop on shutdown{% if required_for != None %} and stopped {{ required_for }}{% endif %}
+
+kill timeout 300
+expect stop
+
+respawn
+respawn limit 10 5
+
+setuid {{ runuser }}
+setgid {{ rungroup }}
+
+env url={{ url }}
+env dir={{ dir }}
+env cachedir={{ cachedir }}
+env authfile={{ authfile }}
+
+pre-start script
+    mkdir -p "$dir"
+    fsck.s3ql --cachedir "$cachedir" --authfile "$authfile" --log syslog --batch "$url"
+end script
+
+exec mount.s3ql --allow-root --cachedir "$cachedir" --authfile "$authfile" --cachesize 10485760 --upstart --log syslog "$url" "$dir"
+
+pre-stop script
+    umount.s3ql "$dir"
+end script
