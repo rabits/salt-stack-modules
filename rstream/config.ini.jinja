@@ -5,8 +5,8 @@
 
 # {{ stream }} configuration file
 [rstream]
-{%- for var, val in salt['pillar.get']('rstream:streams:%s'|format(stream), {}).items() %}
-{%- if var in ['stream-from', 'audio', 'output-dir', 'file-name', 'duration-limit', 'reset-url', 'log-file'] %}
+{%- for var, val in salt['pillar.get']('rstream:streams:%s'|format(stream), {})|dictsort %}
+{%- if var in ['stream-from', 'stream-to', 'audio', 'output-dir', 'file-name', 'duration-limit', 'reset-url', 'log-file'] %}
 {{ var }}: {{ val }}
 {%- endif %}
 {%- endfor %}

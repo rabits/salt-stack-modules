@@ -13,11 +13,12 @@ kill signal INT
 
 respawn
 
-setuid rstream
-setgid rstream
+setuid {{ run_user }}
+setgid {{ run_group }}
 
-{%- if salt['pillar.get']('rstream:streams:%s:debug'|format(stream), False) %}
+{% if salt['pillar.get']('rstream:streams:%s:debug'|format(stream), False) -%}
 env GST_DEBUG=*:4
 export GST_DEBUG
-{% endif %}
+
+{% endif -%}
 exec /usr/local/bin/rstream.py -v --config-file /srv/streams/conf/rstream-{{ stream }}.ini

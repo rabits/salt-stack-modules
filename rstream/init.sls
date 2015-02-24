@@ -25,6 +25,8 @@ rstream:
     - present
   user.present:
     - gid_from_name: True
+    - groups:
+      - audio
     - require:
       - group: rstream
 
@@ -74,6 +76,25 @@ rstream:
       - file: /srv/streams
 {% endif %}
 
+{% if 'stream-to' in data %}
+{%- set stream_to_ip = data['stream-to'].split(':')[0] %}
+{%- set stream_to_port = data['stream-to'].split(':')[1]|int() %}
+/srv/streams/{{ data['name'] }}.sdp:
+  file.managed:
+    - user: root
+    - group: root
+    - mode: 644
+    - contents: |
+        v=0
+        c=IN IP4 {{ stream_to_ip }}
+        m=video {{ stream_to_port }} RTP/AVP 96
+        a=rtpmap:96 H264/90000
+        m=audio {{ stream_to_port + 2 }} RTP/AVP 97
+        a=rtpmap:97 MP4A-LATM/44100
+    - require:
+      - file: /srv/streams
+{% endif %}
+
 {% if 'stream-from' in data %}
 /srv/streams/conf/rstream-{{ stream }}.ini:
   file.managed:
@@ -98,6 +119,8 @@ rstream:
     - group: root
     - mode: 644
     - context:
+      run_user: rstream
+      run_group: {{ 'audio' if 'audio' in data else 'rstream' }}
       stream: {{ stream }}
     - require:
       - file: rstream
