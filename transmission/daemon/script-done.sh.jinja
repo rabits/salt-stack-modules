@@ -14,7 +14,7 @@ transmission-remote "$HOST:$PORT" -n "$USER:$PASSWORD" -t$TR_TORRENT_ID --stop
 {%- if xbmc_present %}
 transmission-remote "$HOST:$PORT" -n "$USER:$PASSWORD" -t$TR_TORRENT_ID --move /srv/media/torrents
 chgrp -R xbmc /srv/media/torrents
-chmod -R g+w /srv/media/torrents
+chmod -R og+w /srv/media/torrents
 {%- endif %}
 transmission-remote "$HOST:$PORT" -n "$USER:$PASSWORD" -t$TR_TORRENT_ID --remove
 
