@@ -9,6 +9,9 @@ author      "asavah"
 start on (started acestream and started acevlc)
 stop on (stopping acestream or stopped acevlc)
 
+respawn
+respawn limit 10 5
+
 setuid acestream
 
 exec python2 /srv/aceproxy/acehttp.py
