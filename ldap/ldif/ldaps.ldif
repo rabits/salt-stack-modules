@@ -1,0 +1,15 @@
+dn: cn=config
+changetype:modify
+replace: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /srv/ssl/keys/internal_ldap.gnutls.key
+-
+replace: olcTLSCertificateFile
+olcTLSCertificateFile: /srv/ssl/certs/internal_ldap.gnutls.crt
+-
+replace: olcTLSVerifyClient
+olcTLSVerifyClient: never
+
+dn: olcDatabase={1}hdb,cn=config
+changetype:modify
+replace: olcSecurity
+olcSecurity: tls=1
