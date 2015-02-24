@@ -41,6 +41,8 @@ collectd-core:
     - group: root
     - mode: 755
     - makedirs: True
+    - require:
+      - pkg: collectd-core
 
 /etc/collectd/collectd.conf:
   file.managed:
@@ -54,6 +56,18 @@ collectd-core:
     - require:
       - pkg: collectd-core
       - file: /etc/collectd/collectd.d
+
+/etc/init/collectd.conf:
+  file.managed:
+    - source: salt://collectd/upstart.conf.jinja
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 644
+    - watch_in:
+      - service: collectd
+    - require:
+      - pkg: collectd-core
 
 collectd:
   service.running:

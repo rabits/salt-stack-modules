@@ -5,7 +5,7 @@
 
 LoadPlugin ping
 <Plugin ping>
-{%- for host in salt['pillar.get']('net:hosts', {}) %}
+{%- for host in salt['pillar.get']('net:hosts', {})|sort %}
     Host "{{ host }}.vpn"
 {%- endfor %}
     Interval 1.0
