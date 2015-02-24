@@ -105,49 +105,49 @@ xinit:
 
 /srv/media:
   file.directory:
-    - user: root
-    - group: root
+    - user: xbmc
+    - group: xbmc
     - mode: 755
     - makedirs: True
 
 /srv/media/photos:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
-    - mode: 775
+    - mode: 777
     - makedirs: True
 
 /srv/media/video:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
-    - mode: 755
+    - mode: 777
     - makedirs: True
 
 /srv/media/video/movies:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
     - mode: 777
     - makedirs: True
 
 /srv/media/video/serials:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
     - mode: 777
     - makedirs: True
 
 /srv/media/video/clips:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
     - mode: 777
     - makedirs: True
 
 /srv/media/music:
   file.directory:
-    - user: root
+    - user: xbmc
     - group: xbmc
     - mode: 777
     - makedirs: True
