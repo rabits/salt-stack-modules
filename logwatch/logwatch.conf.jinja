@@ -1,0 +1,23 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+LogDir = /var/log
+TmpDir = /var/cache/logwatch
+
+Output = mail
+Format = html
+Encode = none
+
+MailTo = root
+MailFrom = Logwatch
+mailer = "/usr/sbin/sendmail -t"
+
+Range = between -7 days and -1 days
+Detail = Low
+
+Service = All
+Service = "-zz-network"
+Service = "-zz-sys"
+Service = "-eximstats"
