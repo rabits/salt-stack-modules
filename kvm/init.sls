@@ -52,14 +52,12 @@ kvm-pkgs:
       - pkg: kvm-pkgs
 
 /etc/default/grub:
-  file.sed:
-    - before: 0
-    - after: 5
-    - limit: '^GRUB_HIDDEN_TIMEOUT='
-#  file.sed:
-#    - before: '""'
-#    - after: '"intel_iommu=on"'
-#    - limit: '^GRUB_CMDLINE_LINUX='
+  file.replace:
+    - pattern: '^GRUB_HIDDEN_TIMEOUT=.*'
+    - repl: 'GRUB_HIDDEN_TIMEOUT=5'
+#  file.replace:
+#    - pattern: '^GRUB_CMDLINE_LINUX=""$'
+#    - repl: 'GRUB_CMDLINE_LINUX="intel_iommu=on"'
 
 #/etc/modprobe.d/vfio_iommu_type1.conf:
 #  file.managed:

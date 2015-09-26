@@ -14,7 +14,7 @@ include:
 {% set nginx_cert = salt['pillar.get']('gogs:ssl_cert', ssl.cert) %}
 
 {% set home_dir = salt['pillar.get']('gogs:home_dir', '/srv/git') %}
-{% set dist_def = 'http://gogs.dn.qbox.me/gogs_v0.5.8_linux_amd64.zip' %}
+{% set dist_def = 'https://github.com/gogits/gogs/releases/download/v0.6.1/linux_amd64.zip' %}
 {% set dist = salt['pillar.get']('gogs:dist', dist_def) %}
 {% set dist_dir = salt['pillar.get']('gogs:dist_dir', '/srv/gogs') %}
 {% set username = salt['pillar.get']('gogs:username', 'git') %}

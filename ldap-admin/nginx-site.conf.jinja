@@ -11,11 +11,11 @@ server {
     allow 192.168.0.0/20;
     deny all;
 
-    rewrite ^ https://$host$uri permanent;
+    return 302 https://{{ nginx_server_name }}$request_uri;
 }
 
 server {
-    listen   {{ nginx_listen }}:443 ssl;
+    listen   {{ nginx_listen }}:443 ssl spdy;
 
     server_name {{ nginx_server_name }};
 
@@ -24,14 +24,8 @@ server {
 
     ssl_certificate            {{ ssl_cert }};
     ssl_certificate_key        {{ ssl_key }};
-    ssl_crl                    {{ ssl_crl }};
-    ssl_client_certificate     {{ ssl_ca_crt }};
-    ssl_ciphers                SSLv2:-LOW:-EXPORT:RC4+RSA;
-    ssl_prefer_server_ciphers  on;
-    ssl_verify_client          optional;
-    ssl_verify_depth           1;
-    ssl_session_cache          shared:SSL:128m;
-    ssl_session_timeout        5m;
+
+    include /etc/nginx/ssl.conf;
 
     root {{ home_dir }};
     charset utf8;

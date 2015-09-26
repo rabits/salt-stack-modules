@@ -21,4 +21,4 @@ slapd:
     - installed
   service.running:
     - require:
-      - pkg: ldap-packages
+      - pkg: ldap-utils
