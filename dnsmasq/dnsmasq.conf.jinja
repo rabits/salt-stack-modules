@@ -7,7 +7,7 @@
 no-dhcp-interface={{ salt['grains.get']('ip_interfaces', ['lo'])|join(' ') }}
 
 listen-address=127.0.0.1
-{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:listen'|format(grains['id']), {}) -%}
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:listen'|format(grains['id']), {})|sort -%}
 listen-address={{ ip }}
 {% endfor -%}
 
@@ -18,7 +18,7 @@ no-poll
 local=/vpn/
 
 # Internal network routers
-{% for name in salt['pillar.get']('net:hosts', {}) -%}
+{% for name in salt['pillar.get']('net:hosts', {})|sort -%}
 {% set router = salt['pillar.get']('net:hosts:%s'|format(name), {}) -%}
 {% if 'route' in router and 'ip' in router -%}
 # Router {{ name }} subnet
@@ -29,6 +29,9 @@ server=/{{ router['route'].split('.')[-2::-1]|join('.') }}.in-addr.arpa/{{ route
 {% endfor -%}
 
 # Other servers (ex. net provider dns nameservers)
-{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:servers'|format(grains['id']), {}) -%}
+{% for ip in salt['pillar.get']('net:hosts:%s:dnsmasq:servers'|format(grains['id']), {})|sort -%}
 server={{ ip }}
-{% endfor -%}
+{% endfor %}
+{% for domain, ip in salt['pillar.get']('net:hosts:%s:dnsmasq:addresses'|format(grains['id']), {})|dictsort -%}
+address=/.{{ domain }}/{{ ip }}
+{% endfor %}

@@ -1,0 +1,33 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+User nobody
+Group nogroup
+
+Listen {% salt['pillar.get']('net:hosts:%s:ip'|format(grains['id']), 'localhost') %}
+Port 80
+
+Timeout 600
+DefaultErrorFile "/usr/share/tinyproxy/default.html"
+StatFile "/usr/share/tinyproxy/stats.html"
+Logfile "/var/log/tinyproxy/tinyproxy.log"
+LogLevel Info
+PidFile "/var/run/tinyproxy/tinyproxy.pid"
+
+MaxClients 100
+MinSpareServers 5
+MaxSpareServers 20
+StartServers 10
+MaxRequestsPerChild 0
+
+Allow 127.0.0.1
+Allow 192.168.0.0/16
+
+ViaProxyName "tinyproxy"
+ConnectPort 443
+ConnectPort 563
+
+upstream 127.0.0.1:4444 ".i2p"
+upstream 127.0.0.1:8124 ".onion"
