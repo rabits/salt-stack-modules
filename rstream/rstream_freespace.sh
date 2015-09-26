@@ -8,17 +8,18 @@
 export PATH="/bin:/usr/bin:/sbin:/usr/sbin"
 export ARCHIVE="/srv/streams/archive"
 
-# If free space < 200GB - we need to clean some old streams
-for i in $(seq 1 6)
+# Find oldest directories in the archive
+# If free space < 150GB - we need to clean some old streams
+find "$ARCHIVE" -mindepth 1 -type d -printf '%T@\t%p\n' | sort -g | head -n6 | cut -f2- \
+    | while IFS= read -r item
 do
-    available_space=$(df -P "${ARCHIVE}" | tail -1 | awk '{ print $4 }')
-    if [ "${available_space}" -lt "$((1024*1024*150))" ]
+    available_space=$(df --block-size=1G -P "${ARCHIVE}" | tail -1 | tr -s ' ' | cut -d' ' -f4)
+    if [ "${available_space}" -lt "150" ]
     then
-        item=$(ls -rt "$ARCHIVE" | grep -v log | head -1)
-        echo "RSTREAM: Available space in /srv - $(($available_space/1024/1025))GB, we need to remove old data '$ARCHIVE/$item'"
-        rm -rf "$ARCHIVE/$item"
+        echo "RSTREAM: Available space in $ARCHIVE: ${available_space}GB, we need to remove old data '$item'"
+        rm -rf "$item"
     else
-        echo "RSTREAM: Available space in /srv - $(($available_space/1024/1025))GB, this is ok"
+        echo "RSTREAM: Available space in $ARCHIVE: ${available_space}GB, it's ok"
         break
     fi
 done

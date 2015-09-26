@@ -12,6 +12,7 @@ stop on runlevel [!2345]
 kill signal INT
 
 respawn
+respawn limit 10 5
 
 setuid {{ run_user }}
 setgid {{ run_group }}

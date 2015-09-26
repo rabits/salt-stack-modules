@@ -2,6 +2,8 @@
 # rStream Video Digital Recorder
 #
 
+{% from 'monit/macros.sls' import monit with context %}
+
 rstream:
   pkg.installed:
     - pkgs:
@@ -48,7 +50,7 @@ rstream:
 
 /srv/streams/conf:
   file.directory:
-    - user: root
+    - user: rstream
     - group: rstream
     - mode: 750
     - require:
@@ -62,24 +64,33 @@ rstream:
     - mode: 755
     - require:
       - user: rstream
-      - file: /srv/streams/archive
+      - file: /srv/streams
+
+/srv/streams/live:
+  file.directory:
+    - user: root
+    - group: root
+    - mode: 755
+    - require:
+      - user: rstream
+      - file: /srv/streams
 
 {% for stream, data in salt['pillar.get']('rstream:streams', {}).items() %}
 {% if 'view' in data %}
-/srv/streams/{{ data['name'] }}.strm:
+/srv/streams/live/{{ data['name'] }}.strm:
   file.managed:
     - user: root
     - group: root
     - mode: 644
     - contents: {{ data['view'] }}
     - require:
-      - file: /srv/streams
+      - file: /srv/streams/live
 {% endif %}
 
 {% if 'stream-to' in data %}
 {%- set stream_to_ip = data['stream-to'].split(':')[0] %}
 {%- set stream_to_port = data['stream-to'].split(':')[1]|int() %}
-/srv/streams/{{ data['name'] }}.sdp:
+/srv/streams/live/{{ data['name'] }}.sdp:
   file.managed:
     - user: root
     - group: root
@@ -92,7 +103,7 @@ rstream:
         m=audio {{ stream_to_port + 2 }} RTP/AVP 97
         a=rtpmap:97 MP4A-LATM/44100
     - require:
-      - file: /srv/streams
+      - file: /srv/streams/live
 {% endif %}
 
 {% if 'stream-from' in data %}
@@ -100,7 +111,7 @@ rstream:
   file.managed:
     - source: salt://rstream/config.ini.jinja
     - template: jinja
-    - user: root
+    - user: rstream
     - group: rstream
     - mode: 640
     - context:
@@ -134,6 +145,22 @@ rstream-{{ stream }}:
     - watch:
       - file: /etc/init/rstream-{{ stream }}.conf
       - file: rstream
+
+{{ monit('rstream', '', stream) }}
+
+/srv/bin/rstream-check-{{ stream }}-archive.sh:
+  file.managed:
+    - user: root
+    - group: root
+    - mode: 755
+    - contents: |
+        #!/bin/sh
+        /usr/bin/test "$(/usr/bin/find "{{ salt['pillar.get']('rstream:streams:%s:output-dir'|format(stream), 'None') }}" -type f -mmin -5)"
+        exit $?
+    - require:
+      - file: /srv/bin
+    - require_in:
+      - service: monit
 {% endif %}
 {% endfor %}
 

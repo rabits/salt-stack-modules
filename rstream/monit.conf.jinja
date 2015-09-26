@@ -1,0 +1,17 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process rstream-{{ subname }} matching "rstream-{{ subname }}.ini"
+    group service
+    group rstream
+    group subname
+    start program = "/usr/sbin/service rstream-{{ subname }} start"
+    stop program  = "/usr/sbin/service rstream-{{ subname }} stop"
+    if 5 restarts with 5 cycles then timeout
+
+check program rstream-{{ subname }}-archive with path "/srv/bin/rstream-check-{{ subname }}-archive.sh"
+    group rstream
+    group subname
+    if status != 0 then alert
