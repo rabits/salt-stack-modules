@@ -1,0 +1,15 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process aceproxy matching "acehttp.py"
+    group service
+    group media
+    group aceproxy
+    start program = "/usr/sbin/service aceproxy start"
+    stop program  = "/usr/sbin/service aceproxy stop"
+    if failed url http://127.0.0.1:8000/stat/ timeout 10 seconds for 3 cycles then restart
+    if failed host 127.0.0.1 port 4212 type tcp for 3 cycles then restart # VLC
+    if failed host 127.0.0.1 port 62062 type tcp for 3 cycles then restart # ACEStream
+    if 5 restarts with 5 cycles then timeout

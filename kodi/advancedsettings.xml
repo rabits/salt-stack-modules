@@ -1,0 +1,23 @@
+<advancedsettings>
+  <loglevel hide="false">0</loglevel>
+  <samba>
+    <clienttimeout>30</clienttimeout>
+  </samba>
+  <useddsfanart>true</useddsfanart>
+  <cputempcommand>sensors|sed -ne "s/CPUTIN: \+[-+]\([0-9]\+\).*/\1 C/p"</cputempcommand>
+  <gputempcommand>sensors|grep -A3 radeon|sed -ne "s/temp1: \+[-+]\([0-9]\+\).*/\1 C/p"</gputempcommand>
+  <gui>
+    <algorithmdirtyregions>3</algorithmdirtyregions>
+    <nofliptimeout>0</nofliptimeout>
+  </gui>
+  <video>
+    <latency>
+      <delay>0</delay>
+      <refresh>
+        <min>23</min>
+        <max>24</max>
+        <delay>175</delay> <!-- set to zero or adjust if audio seems out of sync with 24p movies -->
+      </refresh>
+    </latency>
+  </video>
+</advancedsettings>

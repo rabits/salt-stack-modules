@@ -1,0 +1,44 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+server {
+    listen   80;
+
+    server_name {{ nginx_server_name }};
+
+    return 302 https://{{ nginx_server_name }}$request_uri;
+}
+
+server {
+    listen   443 ssl spdy;
+
+    server_name {{ nginx_server_name }};
+
+    ssl_certificate            {{ ssl_cert }};
+    ssl_certificate_key        {{ ssl_key }};
+
+    include /etc/nginx/ssl.conf;
+
+    charset utf8;
+    limit_conn perip 10;
+    limit_conn perserver 150;
+
+    client_max_body_size 500m;
+    client_body_buffer_size 128k;
+
+    access_log /var/log/nginx/access.{{ nginx_conf_name }}.log;
+    error_log  /var/log/nginx/error.{{ nginx_conf_name }}.log;
+
+    location / {
+        proxy_ignore_client_abort on;
+        proxy_pass   http://127.0.0.1:{{ service_port }};
+    }
+    location /collector {
+        allow 192.168.0.0/20;
+        deny all;
+        proxy_ignore_client_abort on;
+        proxy_pass   http://127.0.0.1:{{ service_port }}/collector;
+    }
+}

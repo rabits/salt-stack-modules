@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!--#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#-->
+
+<Server>
+    <Service>
+        <Connector address="127.0.0.1" port="{{ service_port }}" processors="2" proxyScheme="https" proxyName="{{ nginx_server_name }}" proxyPort="443" />
+        <Engine name="mmonit" defaultHost="localhost" fileCache="10MB">
+{%- if db_type == 'sqlite' %}
+            <Realm url="{{ db_type }}:///{{ db_path }}?synchronous=normal&heap_limit=8000&foreign_keys=on&journal_mode=wal"
+{% else %}
+            <Realm url="{{ db_type }}://{{ db_user }}:{{ db_password }}@{{ db_path }}/{{ db_name }}"
+{%- endif %}
+                   minConnections="5"
+                   maxConnections="30"
+                   reapConnections="300" />
+            <ErrorLogger directory="../log" fileName="error.log" rotate="month" />
+            <Host name="localhost" appBase=".">
+                <Logger directory="../log" fileName="mmonit.log" rotate="month" timestamp="true" />
+                <Context path="" docBase="docroot" sessionTimeout="1800"
+                         maxActiveSessions="1024" saveSessions="true" />
+                <Context path="/collector" docBase="docroot/collector" />
+            </Host>
+        </Engine>
+    </Service>
+    <License owner="{{ license_owner }}">
+        {{ license_data | indent(8) }}
+    </License>
+</Server>

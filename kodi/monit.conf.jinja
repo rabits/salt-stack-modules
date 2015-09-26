@@ -1,0 +1,20 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process kodi matching "kodi.bin"
+    group service
+    group media
+    group kodi
+    start program = "/usr/sbin/service kodi start"
+    stop program  = "/usr/sbin/service kodi stop"
+    if failed host 127.0.0.1 port 8080
+        send "GET / HTTP/1.1\r\n\r\n"
+        expect "HTTP/1.1 401 Unauthorized.*"
+        timeout 10 seconds for 3 cycles then restart
+    if failed host 127.0.0.1 port 9090
+        send '{"jsonrpc":"2.0","id":0,"method":"Player.GetActivePlayers"}'
+        expect '\{".+'
+        timeout 10 seconds for 3 cycles then restart
+    if 5 restarts with 5 cycles then timeout

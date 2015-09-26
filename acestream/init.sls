@@ -15,13 +15,19 @@
 #   * Playback: Disabled start playback minimised
 #
 
+{% from 'monit/macros.sls' import monit with context %}
+
 {% set dist_def = 'http://dl.acestream.org/ubuntu/12/acestream_3.0.5.1_ubuntu_12.04_x86_64.tar.gz' %}
 {% set dist = salt['pillar.get']('acestream:dist', dist_def) %}
 {% set dist_dir = salt['pillar.get']('acestream:dist_dir', '/srv/aceproxy') %}
 {% set username = salt['pillar.get']('acestream:username', 'acestream') %}
 
-python-gevent:
-  pkg.installed
+python-aceproxy-pkgs:
+  pkg.installed:
+    - pkgs:
+      - python-psutil
+      - python-gevent
+      - python-apsw
 
 vlc-nox:
   pkg.installed
@@ -35,13 +41,15 @@ vlc-nox:
     - file_mode: 644
     - exclude_pat: aceconfig.py
     - require:
-      - pkg: python-gevent
+      - pkg: python-aceproxy-pkgs
 
 /var/log/acestream:
   file.directory:
     - user: {{ username }}
     - group: {{ username }}
     - mode: 750
+    - require:
+      - user: {{ username }}
 
 {{ dist_dir }}/acestream:
   file.directory:
@@ -81,7 +89,7 @@ vlc-nox:
   user.present:
     - gid_from_name: True
     - system: True
-    - createhome: False
+    - createhome: True
     - groups:
       - video
       - audio
@@ -98,17 +106,19 @@ vlc-nox:
     - require:
       - file: {{ dist_dir }}
       - file: {{ dist_dir }}/aceconfig.py
-      - user: acestream
+      - user: {{ username }}
 
 aceproxy:
   service.running:
     - require:
-      - user: acestream
+      - user: {{ username }}
       - file: /var/log/acestream
     - watch:
       - file: {{ dist_dir }}
       - file: {{ dist_dir }}/aceconfig.py
       - file: /etc/init/aceproxy.conf
+
+{{ monit('acestream') }}
 
 {{ dist_dir }}/channels.tsv:
   file.managed:
@@ -130,19 +140,32 @@ aceproxy:
 
 {{ dist_dir }}/channels:
   file.directory:
-    - user: acestream
-    - group: acestream
+    - user: {{ username }}
+    - group: {{ username }}
     - mode: 755
     - require:
       - file: {{ dist_dir }}
 
-{{ dist_dir }}/makelist.py 'http://www.trambroid.com/playlist.xspf' {{ dist_dir }}/channels.tsv {{ dist_dir }}/channels/list.m3u 2>&1 > {{ dist_dir }}/channels/lastrun.log:
+{{ dist_dir }}/channels/list.m3u:
+  file.managed:
+    - user: {{ username }}
+    - group: {{ username }}
+    - mode: 644
+
+{{ dist_dir }}/channels/lastrun.log:
+  file.managed:
+    - user: {{ username }}
+    - group: {{ username }}
+    - mode: 644
+
+{{ dist_dir }}/makelist.py 'http://super-pomoyka.us.to/trash/ttv-list/ttv.all.proxy.xspf' {{ dist_dir }}/channels/list.m3u {{ dist_dir }}/channels.tsv > {{ dist_dir }}/channels/lastrun.log 2>&1:
   cron.present:
     - identifier: acestream_makelist
     - user: {{ username }}
-    - minute: 30
-    - hour: 5
+    - minute: '*/15'
     - require:
       - file: {{ dist_dir }}/makelist.py
       - file: {{ dist_dir }}/channels
       - file: {{ dist_dir }}/channels.tsv
+      - file: {{ dist_dir }}/channels/list.m3u
+      - file: {{ dist_dir }}/channels/lastrun.log

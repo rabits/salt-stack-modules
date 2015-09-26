@@ -1,0 +1,47 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+set daemon 120 
+
+set logfile /var/log/monit.log
+set idfile /var/lib/monit/id
+set statefile /var/lib/monit/state
+
+set eventqueue
+    basedir /var/lib/monit/events
+    slots 1000
+
+set mmonit https://{{ mmonit_user }}:{{ mmonit_password }}@{{ mmonit_address }}/collector
+set httpd port 2812
+    allow 127.0.0.1
+    allow {{ mmonit_address }}
+
+include /etc/monit/conf.d/*
+
+{% if grains['get']('virtual') == 'physical' %}
+# Sensors
+check program sensors with path /usr/bin/sensors
+    group system
+    if status != 0 then alert
+{%- endif %}
+
+# RAID
+check file raid with path /proc/mdstat
+    group system
+    group filesystem
+    if match "\[.*_.*\]" then alert
+
+# Root filesystem
+check device rootfs with path /
+    group system
+    group filesystem
+    start program  = "/bin/mount /"
+    stop program  = "/bin/mount -o remount,ro /"
+    if failed permission 755 then unmonitor
+    if failed uid root then unmonitor
+    if space usage > 80% for 5 times within 15 cycles then alert
+    if space usage > 99% then stop
+    if inode usage > 80% then alert
+    if inode usage > 99% then stop
