@@ -1,0 +1,21 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process nginx with pidfile /var/run/nginx.pid
+    group www
+    group nginx
+    start program = "/usr/sbin/service nginx start"
+    stop program  = "/usr/sbin/service nginx stop"
+    if 5 restarts with 5 cycles then timeout
+    depend nginx_bin
+    depend nginx_rc
+
+check file nginx_bin with path /usr/sbin/nginx
+    group nginx
+    include /etc/monit/templates/rootbin
+
+check file nginx_rc with path /etc/init.d/nginx
+    group nginx
+    include /etc/monit/templates/rootbin

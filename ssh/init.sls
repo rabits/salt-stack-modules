@@ -2,6 +2,8 @@
 # SSH client & server
 #
 
+{% from 'monit/macros.sls' import monit with context %}
+
 ssh:
   pkg:
     - installed
@@ -63,3 +65,5 @@ sftp:
     - mode: 750
     - require:
       - user: sftp
+
+{{ monit('ssh') }}

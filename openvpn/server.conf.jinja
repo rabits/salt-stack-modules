@@ -18,7 +18,7 @@ client-config-dir {{ vpn_ccd }}
 server {{ vpn_net }} 255.255.240.0
 
 # Client-Router networks:
-{%- for host, args in salt['pillar.get']('net:hosts', {}).items() %}{% if 'route' in args %}
+{%- for host, args in salt['pillar.get']('net:hosts', {})|dictsort %}{% if 'route' in args %}
 route {{ args['route'] }} {{ vpn_mask }} {{ vpn_ip }} # {{ host }} subnetwork
 {%- endif %}{% endfor %}
 
@@ -34,7 +34,7 @@ keepalive 10 120
 
 comp-lzo
 
-max-clients 10
+max-clients 100
 
 user nobody
 group nogroup

@@ -6,6 +6,7 @@
 
 {% import 'openssl/vars.sls' as ssl with context %}
 {% import 'openvpn/vars.sls' as vpn with context %}
+{% from 'monit/macros.sls' import monit with context %}
 
 include:
   - openvpn
@@ -59,3 +60,5 @@ setcap 'cap_net_bind_service=+ep' /usr/sbin/openvpn:
     - group: root
     - mode: 644
 {% endif %}{% endfor %}
+
+{{ monit('openvpn', '', 'server') }}

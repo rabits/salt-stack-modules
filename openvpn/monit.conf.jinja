@@ -1,0 +1,11 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process openvpn-{{ subname }} with pidfile /var/run/openvpn/server.pid
+    group system
+    group network
+    group openvpn
+    start program = "/usr/sbin/service openvpn start {{ subname }}"
+    stop program  = "/usr/sbin/service openvpn stop {{ subname }}"

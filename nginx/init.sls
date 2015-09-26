@@ -3,6 +3,7 @@
 #
 
 {% import 'openssl/vars.sls' as ssl with context %}
+{% from 'monit/macros.sls' import monit with context %}
 
 nginx-full:
   pkg.installed
@@ -71,3 +72,5 @@ nginx:
     - reload: True
     - watch:
       - pkg: nginx-full
+
+{{ monit('nginx') }}
