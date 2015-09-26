@@ -1,0 +1,10 @@
+#
+# WARNING:
+# This file is under CM control - all manual changes will be removed
+#
+
+check process salt-master with pidfile /var/run/salt-master.pid
+    group system
+    start program = "/usr/sbin/service salt-master start"
+    stop program  = "/usr/sbin/service salt-master stop"
+    if 5 restarts with 5 cycles then timeout

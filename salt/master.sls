@@ -2,6 +2,8 @@
 # Salt master server
 #
 
+{% from 'monit/macros.sls' import monit with context %}
+
 include:
   - salt
 
@@ -36,3 +38,5 @@ salt-master:
       - pkg: salt-master
     - recurse:
       - user
+
+{{ monit('salt', '-master') }}

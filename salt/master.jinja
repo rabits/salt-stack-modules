@@ -4,8 +4,8 @@
 #
 
 interface: 0.0.0.0
-publish_port: {{ salt['config.option']('publish_port') }}
-ret_port: {{ salt['config.option']('ret_port') }}
+publish_port: {{ salt['pillar.get']('saltstack:publish_port', '4505') }}
+ret_port: {{ salt['pillar.get']('saltstack:ret_port', '4506') }}
 
 user: salt-stack
 max_open_files: 100000

@@ -2,6 +2,8 @@
 # Salt client
 #
 
+{% from 'monit/macros.sls' import monit with context %}
+
 # Salt-Stack repo
 salt-stack-repo:
   pkgrepo.managed:
@@ -10,10 +12,9 @@ salt-stack-repo:
      - pkg: salt-minion
 
 /etc/init/salt-minion.conf:
-  file.sed:
-    - before: '#'
-    - after: ''
-    - limit: '^#respawn$'
+  file.replace:
+    - pattern: '^#respawn$'
+    - repl: 'respawn'
 
 salt-minion:
   pkg:
@@ -28,3 +29,5 @@ salt-minion:
     - user: root
     - group: root
     - mode: 600
+
+{{ monit('salt') }}
