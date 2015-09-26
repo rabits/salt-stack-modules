@@ -6,8 +6,8 @@
 description "S3QL S3 filesystem upstart script"
 author      "Rabit <home@rabits.org>"
 
-start on (local-filesystems and net-device-up IFACE!=lo{% if required_for != None %} and starting {{ required_for }}{% endif %})
-stop on shutdown{% if required_for != None %} and stopped {{ required_for }}{% endif %}
+start on (local-filesystems and net-device-up IFACE!=lo{% if required_for != None %} or starting {{ required_for }}{% endif %})
+stop on shutdown{% if required_for != None %} or stopped {{ required_for }}{% endif %}
 
 kill timeout 300
 expect stop

@@ -62,6 +62,9 @@ s2s_secure_auth = true
 s2s_insecure_domains = {
 }
 
+-- Listen default jabber port & icq port
+c2s_ports = { 5222, 5190 }
+
 authentication = "ldap"
 
 ldap_server = "{{ ldap_server }}"

@@ -2,7 +2,7 @@
 # Transmission - torrent daemon
 #
 
-{% set xbmc_present = salt['additional.state_in'](['xbmc']) %}
+{% set kodi_present = salt['additional.state_in'](['kodi']) %}
 
 transmission-daemon:
   pkg:
@@ -11,12 +11,12 @@ transmission-daemon:
     - require:
       - pkg: transmission-daemon
 
-{% if xbmc_present -%}
+{% if kodi_present -%}
 debian-transmission:
   user.present:
     - groups:
       - debian-transmission
-      - xbmc
+      - kodi
 {%- endif %}
 
 /srv/torrent/incomplete:
@@ -63,7 +63,7 @@ debian-transmission:
     - group: debian-transmission
     - mode: 750
     - context:
-      xbmc_present: {{ xbmc_present }}
+      kodi_present: {{ kodi_present }}
     - require:
       - pkg: transmission-daemon
 

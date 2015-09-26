@@ -56,16 +56,11 @@ prosody:
 
 /etc/prosody/sharedgroups.ini:
   file.managed:
+    - source: salt://prosody/sharedgroups.ini.jinja
+    - template: jinja
     - user: root
     - group: prosody
     - mode: 640
-    - contents: |
-{%- for group, users in salt['pillar.get']('prosody:groups', {})|dictsort %}
-        [{{ group }}]
-{%- for login, name in users|dictsort %}
-        {{ login }}={{ name.decode('unicode-escape') }}
-{%- endfor %}
-{%- endfor %}
     - require:
       - pkg: prosody-packages
     - watch_in:

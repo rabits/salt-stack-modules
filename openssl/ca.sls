@@ -123,7 +123,7 @@ openssl dhparam -out {{ ssl.dh }} 2048:
 
 {% for host, args in salt['pillar.get']('net:hosts', {}).items() %}
 {% set file_name = "internal_" + salt['additional.inverse'](host) %}
-openssl req -config {{ ssl.ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 365{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ ssl.keys }}/{{ file_name }}.key -out {{ ssl.csrs }}/{{ file_name }}.csr -subj '/CN={{ host }}':
+openssl req -config {{ ssl.ca_config }} {% if 'server' in args %}-extensions server{% else %}-days 1095{% endif %} -new -newkey 'rsa:2048' -nodes -keyout {{ ssl.keys }}/{{ file_name }}.key -out {{ ssl.csrs }}/{{ file_name }}.csr -subj '/CN={{ host }}':
   cmd.run:
     - unless: test -f {{ ssl.csrs }}/{{ file_name }}.csr -o -f {{ ssl.certs }}/{{ file_name }}.crt
     - require:

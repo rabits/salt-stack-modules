@@ -10,7 +10,7 @@ light-locker:
 
 /etc/xdg/awesome/rc.lua:
   file.managed:
-    - source: salt://awesome/rc.lua.jinja
+    - source: salt://awesome/rc.lua
     - user: root
     - group: root
     - mode: 644

@@ -1,0 +1,6 @@
+{% for group, users in salt['pillar.get']('prosody:groups', {})|dictsort -%}
+[{{ group }}]
+{%- for login, name in users|dictsort %}
+{{ login }}={{ name.decode('unicode-escape') }}
+{%- endfor %}
+{%- endfor %}
